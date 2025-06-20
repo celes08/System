@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - CVSU Department Bulletin Board System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-container" id="dashboardContainer">
+        <!-- Left Sidebar Navigation (Same as other pages) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="img/logo.png" alt="CVSU Logo" class="sidebar-logo">
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="dashboard.php"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li>
+                        <a href="organizational-chart.php"><i class="fas fa-sitemap"></i> Organizational Chart</a>
+                    </li>
+                    <li>
+                        <a href="notifications.php"><i class="fas fa-bell"></i> Notifications</a>
+                    </li>
+                    <li>
+                        <a href="bookmarks.php"><i class="fas fa-bookmark"></i> Bookmarks</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-user"></i> Profile</a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="post-button-container">
+                <button class="post-button" id="postButton">
+                    <i class="fas fa-plus"></i> Post
+                </button>
+            </div>
+            
+            <div class="sidebar-footer">
+                <ul>
+                    <li class="active"><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="help.php"><i class="fas fa-question-circle"></i> Help</a></li>
+                    <li><a href="index.php"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
+                </ul>
+                
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <img src="img/avatar-placeholder.png" alt="User Avatar">
+                    </div>
+                    <div class="user-info">
+                        <h4>Person</h4>
+                        <p>@person</p>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="settings-main-content">
+            <header class="settings-header">
+                <h1>Settings</h1>
+                <p>Manage your account preferences and application settings</p>
+            </header>
+            
+            <div class="settings-content">
+                <!-- Account Information Section -->
+                <div class="settings-section">
+                    <div class="section-header" data-section="account">
+                        <div class="section-title">
+                            <i class="fas fa-user-circle"></i>
+                            <h3>Account Information</h3>
+                        </div>
+                        <i class="fas fa-chevron-down section-arrow"></i>
+                    </div>
+                    <div class="section-content" id="account-content">
+                        <div class="account-info-grid">
+                            <div class="info-item">
+                                <label>First Name</label>
+                                <div class="info-value">
+                                    <span id="display-firstName">John</span>
+                                    <button class="edit-btn" data-field="firstName">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                                <input type="text" id="edit-firstName" class="edit-input hidden" value="John">
+                            </div>
+                            
+                            <div class="info-item">
+                                <label>Last Name</label>
+                                <div class="info-value">
+                                    <span id="display-lastName">Doe</span>
+                                    <button class="edit-btn" data-field="lastName">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                                <input type="text" id="edit-lastName" class="edit-input hidden" value="Doe">
+                            </div>
+                            
+                            <div class="info-item">
+                                <label>Email Address</label>
+                                <div class="info-value">
+                                    <span id="display-email">john.doe@cvsu.edu.ph</span>
+                                    <span class="readonly-badge">Read Only</span>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <label>Student Number</label>
+                                <div class="info-value">
+                                    <span id="display-studentNumber">202312345</span>
+                                    <span class="readonly-badge">Read Only</span>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <label>Department</label>
+                                <div class="info-value">
+                                    <span id="display-department">Department of Information Technology (DIT)</span>
+                                    <button class="edit-btn" data-field="department">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                                <select id="edit-department" class="edit-input hidden">
+                                    <option value="DIT">Department of Information Technology (DIT)</option>
+                                    <option value="DOM">Department of Management (DOM)</option>
+                                    <option value="DAS">Department of Arts and Sciences (DAS)</option>
+                                    <option value="TED">Teacher Education Department (TED)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="info-item">
+                                <label>Date of Birth</label>
+                                <div class="info-value">
+                                    <span id="display-dateOfBirth">1995</span>
+                                    <button class="edit-btn" data-field="dateOfBirth">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                                <select id="edit-dateOfBirth" class="edit-input hidden">
+                                    <!-- Will be populated by JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="section-actions">
+                            <button class="save-changes-btn" id="saveAccountChanges" disabled>
+                                <i class="fas fa-save"></i>
+                                Save Changes
+                            </button>
+                            <button class="change-password-btn" id="changePasswordBtn">
+                                <i class="fas fa-key"></i>
+                                Change Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appearance Section -->
+                <div class="settings-section">
+                    <div class="section-header" data-section="appearance">
+                        <div class="section-title">
+                            <i class="fas fa-palette"></i>
+                            <h3>Appearance</h3>
+                        </div>
+                        <i class="fas fa-chevron-down section-arrow"></i>
+                    </div>
+                    <div class="section-content" id="appearance-content">
+                        <div class="appearance-options">
+                            <div class="theme-selection">
+                                <h4>Theme Preference</h4>
+                                <p>Choose how the application looks to you</p>
+                                
+                                <div class="theme-options">
+                                    <div class="theme-option" data-theme="light">
+                                        <div class="theme-preview light-preview">
+                                            <div class="preview-header"></div>
+                                            <div class="preview-content">
+                                                <div class="preview-sidebar"></div>
+                                                <div class="preview-main"></div>
+                                            </div>
+                                        </div>
+                                        <div class="theme-info">
+                                            <h5>Light Mode</h5>
+                                            <p>Clean and bright interface</p>
+                                        </div>
+                                        <input type="radio" name="theme" value="light" id="theme-light" checked>
+                                    </div>
+                                    
+                                    <div class="theme-option" data-theme="dark">
+                                        <div class="theme-preview dark-preview">
+                                            <div class="preview-header"></div>
+                                            <div class="preview-content">
+                                                <div class="preview-sidebar"></div>
+                                                <div class="preview-main"></div>
+                                            </div>
+                                        </div>
+                                        <div class="theme-info">
+                                            <h5>Dark Mode</h5>
+                                            <p>Easy on the eyes in low light</p>
+                                        </div>
+                                        <input type="radio" name="theme" value="dark" id="theme-dark">
+                                    </div>
+                                    
+                                    <div class="theme-option" data-theme="system">
+                                        <div class="theme-preview system-preview">
+                                            <div class="preview-header"></div>
+                                            <div class="preview-content">
+                                                <div class="preview-sidebar"></div>
+                                                <div class="preview-main"></div>
+                                            </div>
+                                        </div>
+                                        <div class="theme-info">
+                                            <h5>System Default</h5>
+                                            <p>Matches your device settings</p>
+                                        </div>
+                                        <input type="radio" name="theme" value="system" id="theme-system">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="other-appearance-settings">
+                                <h4>Display Options</h4>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <label>Compact Mode</label>
+                                        <p>Show more content by reducing spacing</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="compactMode">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <label>High Contrast</label>
+                                        <p>Increase contrast for better visibility</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="highContrast">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Section -->
+                <div class="settings-section">
+                    <div class="section-header" data-section="notifications">
+                        <div class="section-title">
+                            <i class="fas fa-bell"></i>
+                            <h3>Notifications</h3>
+                        </div>
+                        <i class="fas fa-chevron-down section-arrow"></i>
+                    </div>
+                    <div class="section-content" id="notifications-content">
+                        <div class="notifications-settings">
+                            <div class="notification-category">
+                                <h4>Email Notifications</h4>
+                                <p>Choose what you want to be notified about via email</p>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <label>All Announcements</label>
+                                        <p>Receive emails for all new announcements</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="emailAllAnnouncements" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <label>Department Announcements Only</label>
+                                        <p>Only receive emails from your department</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="emailDepartmentOnly">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <label>Mentions and Replies</label>
+                                        <p>Get notified when someone mentions you or replies to your posts</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="emailMentions" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                
+                            </div>
+                            
+                            <div class="notification-category">
+                                <h4>Push Notifications</h4>
+                                <p>Manage browser and mobile notifications</p>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <label>Browser Notifications</label>
+                                        <p>Show notifications in your browser</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="browserNotifications" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <label>Sound Notifications</label>
+                                        <p>Play sound when receiving notifications</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="soundNotifications">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="notification-category">
+                                <h4>Notification Frequency</h4>
+                                <p>Control how often you receive notifications</p>
+                                
+                                <div class="frequency-options">
+                                    <label class="frequency-option">
+                                        <input type="radio" name="frequency" value="instant" checked>
+                                        <div class="frequency-info">
+                                            <h5>Instant</h5>
+                                            <p>Receive notifications immediately</p>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="frequency-option">
+                                        <input type="radio" name="frequency" value="hourly">
+                                        <div class="frequency-info">
+                                            <h5>Hourly</h5>
+                                            <p>Bundle notifications every hour</p>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="frequency-option">
+                                        <input type="radio" name="frequency" value="daily">
+                                        <div class="frequency-info">
+                                            <h5>Daily</h5>
+                                            <p>Receive a daily summary</p>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" id="changePasswordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Change Password</h2>
+                <button class="modal-close" id="changePasswordModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="changePasswordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" name="currentPassword" placeholder="Enter current password" required>
+                        <span class="error-message" id="currentPasswordError"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password" required>
+                        <span class="error-message" id="newPasswordError"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmNewPassword">Confirm New Password</label>
+                        <input type="password" id="confirmNewPassword" name="confirmNewPassword" placeholder="Confirm new password" required>
+                        <span class="error-message" id="confirmNewPasswordError"></span>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" id="cancelPasswordChange">Cancel</button>
+                        <button type="submit" class="save-btn">
+                            <i class="fas fa-save"></i>
+                            Change Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Notification -->
+    <div class="notification-toast" id="notificationToast">
+        <div class="toast-content">
+            <i class="toast-icon"></i>
+            <span class="toast-message"></span>
+        </div>
+        <button class="toast-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="settings.js"></script>
+</body>
+</html>
