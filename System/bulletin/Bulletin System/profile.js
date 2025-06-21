@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (editProfileBtn) {
       editProfileBtn.addEventListener("click", () => {
         // Redirect to settings page
-        window.location.href = "settings.html"
+        window.location.href = "settings.php"
       })
     }
   }

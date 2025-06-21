@@ -1,3 +1,7 @@
+<?php
+include("user_session.php");
+requireLogin();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,7 +24,7 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li class="active">
-                        <a href="#"><i class="fas fa-home"></i> Home</a>
+                        <a href="dashboard.php"><i class="fas fa-home"></i> Home</a>
                     </li>
                     <li>
                         <a href="organizational-chart.php"><i class="fas fa-sitemap"></i> Organizational Chart</a>
@@ -47,7 +51,7 @@
                 <ul>
                     <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
                     <li><a href="help.php"><i class="fas fa-question-circle"></i> Help</a></li>
-                    <li><a href="index.php"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
+                    <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
                 </ul>
                 
                 <div class="user-profile">
@@ -55,8 +59,8 @@
                         <img src="img/avatar-placeholder.png" alt="User Avatar">
                     </div>
                     <div class="user-info">
-                        <h4>Person</h4>
-                        <p>@person</p>
+                        <h4><?php echo htmlspecialchars($currentUser['fullName']); ?></h4>
+                        <p><?php echo htmlspecialchars($currentUser['username']); ?></p>
                     </div>
                     <i class="fas fa-chevron-down"></i>
                 </div>

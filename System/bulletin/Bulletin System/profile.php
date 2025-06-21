@@ -1,3 +1,17 @@
+<?php
+include("user_session.php");
+requireLogin();
+
+// Debug output
+echo "<!-- Debug: Profile page loaded -->";
+if ($currentUser) {
+    echo "<!-- Debug: User data available in profile.php -->";
+    echo "<!-- Debug: Full name: " . htmlspecialchars($currentUser['fullName']) . " -->";
+    echo "<!-- Debug: Username: " . htmlspecialchars($currentUser['username']) . " -->";
+} else {
+    echo "<!-- Debug: No user data available in profile.php -->";
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,7 +60,7 @@
                 <ul>
                     <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
                     <li><a href="help.php"><i class="fas fa-question-circle"></i> Help</a></li>
-                    <li><a href="index.php"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
+                    <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
                 </ul>
                 
                 <div class="user-profile">
@@ -54,8 +68,8 @@
                         <img src="img/avatar-placeholder.png" alt="User Avatar">
                     </div>
                     <div class="user-info">
-                        <h4>Person</h4>
-                        <p>@person</p>
+                        <h4><?php echo htmlspecialchars($currentUser['fullName']); ?></h4>
+                        <p><?php echo htmlspecialchars($currentUser['username']); ?></p>
                     </div>
                     <i class="fas fa-chevron-down"></i>
                 </div>
@@ -69,7 +83,7 @@
                 <div class="profile-cover">
                     <div class="profile-avatar-container">
                         <div class="profile-avatar">
-                            <img src="img/avatar-placeholder.png" alt="Person" id="profileAvatar">
+                            <img src="img/avatar-placeholder.png" alt="Profile Picture" id="profileAvatar">
                         </div>
                     </div>
                     <button class="edit-profile-btn" id="editProfileBtn">
@@ -78,24 +92,11 @@
                 </div>
                 
                 <div class="profile-info">
-                    <h1 class="profile-name" id="profileName">Person</h1>
-                    <p class="profile-username" id="profileUsername">@person</p>
-                    <p class="profile-joined" id="profileJoined">Joined May 7, 2025</p>
-                    
-                    <div class="profile-stats">
-                        <div class="stat-item">
-                            <span class="stat-number" id="postsCount">0</span>
-                            <span class="stat-label">Posts</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number" id="likesCount">0</span>
-                            <span class="stat-label">Likes</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number" id="commentsCount">0</span>
-                            <span class="stat-label">Comments</span>
-                        </div>
-                    </div>
+                    <h1 class="profile-name" id="profileName"><?php echo htmlspecialchars($currentUser['fullName']); ?></h1>
+                    <p class="profile-username" id="profileUsername"><?php echo htmlspecialchars($currentUser['username']); ?></p>
+                    <p class="profile-joined" id="profileJoined">Email: <?php echo htmlspecialchars($currentUser['email']); ?></p>
+                    <p class="profile-joined" id="profileDepartment">Department: <?php echo htmlspecialchars($currentUser['department']); ?></p>
+                    <p class="profile-joined" id="profileStudentNumber">Student Number: <?php echo htmlspecialchars($currentUser['studentNumber']); ?></p>
                 </div>
             </div>
             

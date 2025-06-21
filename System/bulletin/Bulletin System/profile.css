@@ -13,9 +13,11 @@
 
 /* Profile Header */
 .profile-header {
-  background-color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
   flex-shrink: 0;
-  position: relative;
 }
 
 .profile-cover {
@@ -72,7 +74,11 @@
 
 /* Profile Info */
 .profile-info {
-  padding: 60px 30px 30px 30px;
+  position: sticky;
+  top: 150px; /* height of .profile-cover */
+  z-index: 9;
+  background: white;
+  padding: 60px 30px 5px 30px;
 }
 
 .profile-name {
@@ -135,6 +141,9 @@
 
 /* Profile Tabs */
 .profile-tabs {
+  position: sticky;
+  top: 270px; /* height of .profile-cover + .profile-info */
+  z-index: 8;
   display: flex;
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
@@ -176,6 +185,7 @@
   flex: 1;
   overflow-y: auto;
   background-color: #f8f9fa;
+  height: calc(100vh - 270px); /* adjust based on sticky header heights */
 }
 
 .tab-content {

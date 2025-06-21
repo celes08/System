@@ -75,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['loginButton'])) {
     if (empty($loginEmail) || empty($loginPassword)) {
         $errors[] = "Email and password are required for login.";
     } else {
-        $stmt = $con->prepare("SELECT id, password FROM signuptbl WHERE email = ?");
+        $stmt = $con->prepare("SELECT user_id, password FROM signuptbl WHERE email = ?");
         $stmt->bind_param("s", $loginEmail);
         $stmt->execute();
         $stmt->store_result();

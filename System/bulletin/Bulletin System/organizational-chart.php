@@ -1,3 +1,7 @@
+<?php
+include("user_session.php");
+requireLogin();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,9 +48,9 @@
             
             <div class="sidebar-footer">
                 <ul>
-                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
-                    <li><a href="help.html"><i class="fas fa-question-circle"></i> Help</a></li>
-                    <li><a href="index.html"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
+                    <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="help.php"><i class="fas fa-question-circle"></i> Help</a></li>
+                    <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
                 </ul>
                 
                 <div class="user-profile">
@@ -54,8 +58,8 @@
                         <img src="img/avatar-placeholder.png" alt="User Avatar">
                     </div>
                     <div class="user-info">
-                        <h4>Person</h4>
-                        <p>@person</p>
+                        <h4><?php echo htmlspecialchars($currentUser['fullName']); ?></h4>
+                        <p><?php echo htmlspecialchars($currentUser['username']); ?></p>
                     </div>
                     <i class="fas fa-chevron-down"></i>
                 </div>
