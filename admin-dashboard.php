@@ -109,7 +109,7 @@ if (isset($_SESSION['high_contrast']) && $_SESSION['high_contrast']) {
         </main>
 
     <!-- Floating Help Button -->
-    <div class="floating-help-btn" onclick="navigateTo('admin-help.html')" title="Help Tickets">
+    <div class="floating-help-btn" onclick="navigateTo('admin-help.php')" title="Help Tickets">
         <i class="fas fa-life-ring"></i>
         <span class="help-badge" id="helpTicketsBadge">15</span>
     </div>
@@ -156,10 +156,9 @@ if (isset($_SESSION['high_contrast']) && $_SESSION['high_contrast']) {
         function openSchoolAdmin() {
             window.location.href = 'school-admins.php';
         }
-         function openAdminLogs() {
+        function openAdminLogs() {
             window.location.href = 'admin-logs.php';
         }
-        
     </script>
 </body>
 </html>

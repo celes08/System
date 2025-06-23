@@ -21,7 +21,7 @@ $user = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Admins - Admin Portal</title>
+    <title>Registered Users - Admin Portal</title>
     <link rel="stylesheet" href="admin-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
@@ -59,16 +59,13 @@ $user = [
         <header class="admin-header">
             <div class="header-left">
                 <img src="Bulletin System/img/logo.png" alt="CVSU Logo" class="logo">
-                <h1>School Admins</h1>
+                <h1>Registered Users</h1>
             </div>
             <div class="header-right">
                 <div class="search-container">
-                    <input type="text" id="adminSearch" placeholder="Search admins..." class="search-input">
+                    <input type="text" id="userSearch" placeholder="Search users..." class="search-input">
                     <i class="fas fa-search search-icon"></i>
                 </div>
-                <button class="btn-primary" onclick="openCreateAdminModal()">
-                    <i class="fas fa-plus"></i> Create Admin
-                </button>
             </div>
         </header>
 
@@ -78,15 +75,16 @@ $user = [
                 <table class="admin-table">
                     <thead>
                         <tr>
+                            <th>Student Number</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Department</th>
-                            <th>Created Date</th>
+                            <th>Date of Birth</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="adminsTableBody">
-                        <!-- Admins will be populated here -->
+                    <tbody id="usersTableBody">
+                        <!-- Users will be populated here -->
                     </tbody>
                 </table>
             </div>
@@ -99,69 +97,57 @@ $user = [
         </main>
     </div>
 
-    <!-- Create Admin Modal -->
-    <div class="modal" id="createAdminModal">
+    <!-- User Details Modal -->
+    <div class="modal" id="userDetailsModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Create School Admin</h3>
-                <span class="modal-close" id="createModalClose">&times;</span>
+                <h3>User Details</h3>
+                <span class="modal-close" id="userModalClose">&times;</span>
             </div>
-            <form id="createAdminForm">
-                <div class="form-group">
-                    <label for="adminFirstName">First Name</label>
-                    <input type="text" id="adminFirstName" required>
-                </div>
-                <div class="form-group">
-                    <label for="adminLastName">Last Name</label>
-                    <input type="text" id="adminLastName" required>
-                </div>
-                <div class="form-group">
-                    <label for="adminEmail">Email</label>
-                    <input type="email" id="adminEmail" required>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeCreateAdminModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Create Admin</button>
-                </div>
-            </form>
-            <div class="password-info">
-                <p><strong>Note:</strong> Default password will be <code>SAdmin123</code></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Details Modal -->
-    <div class="modal" id="adminDetailsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Admin Details</h3>
-                <span class="modal-close" id="adminModalClose">&times;</span>
-            </div>
-            <div class="admin-details">
+            <div class="user-details">
                 <div class="detail-group">
                     <label>First Name:</label>
-                    <span id="adminDetailFirstName"></span>
+                    <span id="userFirstName"></span>
                 </div>
                 <div class="detail-group">
                     <label>Last Name:</label>
-                    <span id="adminDetailLastName"></span>
+                    <span id="userLastName"></span>
                 </div>
                 <div class="detail-group">
                     <label>Email:</label>
-                    <span id="adminDetailEmail"></span>
+                    <span id="userEmail"></span>
+                </div>
+                <div class="detail-group">
+                    <label>Student Number:</label>
+                    <span id="userStudentNumber"></span>
                 </div>
                 <div class="detail-group">
                     <label>Department:</label>
-                    <span id="adminDetailDepartment"></span>
+                    <span id="userDepartment"></span>
                 </div>
                 <div class="detail-group">
-                    <label>Created Date:</label>
-                    <span id="adminDetailCreatedDate"></span>
+                    <label>Date of Birth:</label>
+                    <span id="userDateOfBirth"></span>
+                </div>
+                <div class="detail-group">
+                    <label>Registration Date:</label>
+                    <span id="userRegistrationDate"></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="school-admins.js"></script>
+    <!-- Update User Modal -->
+    <div class="modal" id="updateUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Update User</h3>
+                <span class="modal-close" id="updateModalClose">&times;</span>
+            </div>
+            <!-- ...rest of update user modal... -->
+        </div>
+    </div>
+
+    <script src="registered-users.js"></script>
 </body>
 </html>
