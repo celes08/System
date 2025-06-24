@@ -2,6 +2,23 @@
 // PHP SCRIPT START
 session_start();
 
+// Function to update admin appearance settings in session (no redirect)
+function saveAdminAppearanceSettings() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveAppearance'])) {
+        $_SESSION['admin_theme'] = $_POST['theme'] ?? 'light';
+        $_SESSION['admin_compactMode'] = isset($_POST['compactMode']) ? 1 : 0;
+        $_SESSION['admin_highContrast'] = isset($_POST['highContrast']) ? 1 : 0;
+        // Optionally update $adminUser array if used elsewhere
+        // $adminUser['theme'] = $_SESSION['admin_theme'];
+        // $adminUser['compactMode'] = $_SESSION['admin_compactMode'];
+        // $adminUser['highContrast'] = $_SESSION['admin_highContrast'];
+        // No redirect, just update session so all pages reflect new settings
+    }
+}
+
+// Call the function at the top of the script
+saveAdminAppearanceSettings();
+
 // Initialize user data and settings from session or defaults
 $adminUser = [
     'firstName' => $_SESSION['admin_firstName'] ?? 'Admin',
@@ -978,7 +995,7 @@ $bodyClass = implode(' ', $bodyClasses);
         <header class="admin-header">
             <div class="header-left">
                 <!-- Using a placeholder image for logo -->
-                <img src="https://placehold.co/50x50/1b4332/FFFFFF?text=CvSU" alt="CVSU Logo" class="logo">
+                <img src="img/logo.png" alt="CVSU Logo" class="logo">
                 <h1>Admin Settings</h1>
             </div>
             <div class="header-right">
@@ -1679,6 +1696,16 @@ $bodyClass = implode(' ', $bodyClasses);
              // This toggle will be submitted with the form; no real-time JS effect needed besides initial state
         }
 
+        // Make notification toast close button functional on page load
+        const toast = document.getElementById("notificationToast");
+        if (toast) {
+            const closeBtn = toast.querySelector(".toast-close");
+            if (closeBtn) {
+                closeBtn.addEventListener("click", function() {
+                    toast.classList.remove("show");
+                });
+            }
+        }
     });
     </script>
 </body>

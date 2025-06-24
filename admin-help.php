@@ -1,3 +1,22 @@
+<?php
+session_start();
+$bodyClass = 'admin-body';
+if (isset($_SESSION['admin_theme'])) {
+    if ($_SESSION['admin_theme'] === 'dark') {
+        $bodyClass .= ' dark-theme';
+    } elseif ($_SESSION['admin_theme'] === 'light') {
+        $bodyClass .= ' light-theme';
+    } elseif ($_SESSION['admin_theme'] === 'system') {
+        $bodyClass .= ' system-theme';
+    }
+}
+if (isset($_SESSION['admin_compactMode']) && $_SESSION['admin_compactMode']) {
+    $bodyClass .= ' compact-mode';
+}
+if (isset($_SESSION['admin_highContrast']) && $_SESSION['admin_highContrast']) {
+    $bodyClass .= ' high-contrast';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,12 +26,12 @@
     <link rel="stylesheet" href="admin-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="admin-body">
+<body class="<?php echo $bodyClass; ?>">
     <div class="admin-container">
         <!-- Header -->
         <header class="admin-header">
             <div class="header-left">
-                <img src="Bulletin System/img/logo.png" alt="CVSU Logo" class="logo">
+                <img src="img/logo.png" alt="CVSU Logo" class="logo">
                 <h1>Help Tickets</h1>
             </div>
         </header>

@@ -1,6 +1,12 @@
 <?php
 // PHP SCRIPT START
 session_start();
+include_once "theme-manager.php";
+
+// Use the same session variable names as admin-settings.php
+$theme = $_SESSION['admin_theme'] ?? 'system';
+$compactMode = $_SESSION['admin_compactMode'] ?? false;
+$highContrast = $_SESSION['admin_highContrast'] ?? false;
 
 // Simulated user data (replace with DB logic in production for persistent storage)
 $user = [
@@ -10,9 +16,6 @@ $user = [
     'studentNumber' => '202312345',
     'department' => $_SESSION['department'] ?? 'DIT',
     'dateOfBirth' => $_SESSION['dateOfBirth'] ?? '1995',
-    'theme' => $_SESSION['theme'] ?? 'system',
-    'compactMode' => $_SESSION['compactMode'] ?? false,
-    'highContrast' => $_SESSION['highContrast'] ?? false,
 ];
 // PHP SCRIPT END
 ?>
@@ -24,41 +27,13 @@ $user = [
     <title>School Admins - Admin Portal</title>
     <link rel="stylesheet" href="admin-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var theme = '<?php echo $user['theme']; ?>';
-            var compactMode = <?php echo $user['compactMode'] ? 'true' : 'false'; ?>;
-            var highContrast = <?php echo $user['highContrast'] ? 'true' : 'false'; ?>;
-            function applyTheme(theme, compact, contrast) {
-                var body = document.body;
-                body.classList.remove('light-theme', 'dark-theme', 'high-contrast', 'compact-mode');
-                if (contrast) {
-                    body.classList.add('high-contrast');
-                } else if (theme === 'dark') {
-                    body.classList.add('dark-theme');
-                } else if (theme === 'system') {
-                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                        body.classList.add('dark-theme');
-                    } else {
-                        body.classList.add('light-theme');
-                    }
-                } else {
-                    body.classList.add('light-theme');
-                }
-                if (compact) {
-                    body.classList.add('compact-mode');
-                }
-            }
-            applyTheme(theme, compactMode, highContrast);
-        });
-    </script>
 </head>
-<body class="admin-body<?php echo ($user['theme'] === 'dark' || ($user['theme'] === 'system' && (isset($_SERVER['HTTP_SEC_CH_UA_PLATFORM']) && strpos(strtolower($_SERVER['HTTP_SEC_CH_UA_PLATFORM']), 'dark') !== false))) ? ' dark-theme' : ''; ?><?php echo $user['highContrast'] ? ' high-contrast' : ''; ?><?php echo $user['compactMode'] ? ' compact-mode' : ''; ?>">
+<body class="<?php echo getThemeClasses(); ?>">
     <div class="admin-container">
         <!-- Header -->
         <header class="admin-header">
             <div class="header-left">
-                <img src="Bulletin System/img/logo.png" alt="CVSU Logo" class="logo">
+                <img src="img/logo.png" alt="CVSU Logo" class="logo">
                 <h1>School Admins</h1>
             </div>
             <div class="header-right">
@@ -162,6 +137,6 @@ $user = [
         </div>
     </div>
 
-    <script src="school-admins.js"></script>
+    <!-- <script src="school-admins.js"></script> -->
 </body>
 </html>

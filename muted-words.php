@@ -1,6 +1,7 @@
 <?php
 // PHP SCRIPT START
 session_start();
+include_once "theme-manager.php";
 
 $successMsg = '';
 $errorMsg = '';
@@ -9,31 +10,75 @@ $errorMsg = '';
 // Store each muted word as an associative array to hold 'word' and 'reason'
 $_SESSION['admin_muted_words'] = $_SESSION['admin_muted_words'] ?? [];
 
+/**
+ * Adds a muted word/phrase to the session list if not a duplicate.
+ * @param string $word The word or phrase to mute.
+ * @param string $reason The reason for muting.
+ * @return array [success (bool), message (string)]
+ */
+function addMutedWord($word, $reason = '') {
+    if (!isset($_SESSION['admin_muted_words']) || !is_array($_SESSION['admin_muted_words'])) {
+        $_SESSION['admin_muted_words'] = [];
+    }
+    $word = trim($word);
+    if ($word === '') {
+        return [false, 'Word/phrase cannot be empty.'];
+    }
+    foreach ($_SESSION['admin_muted_words'] as $item) {
+        if (strtolower($item['word']) === strtolower($word)) {
+            return [false, 'This word/phrase already exists in the muted list.'];
+        }
+    }
+    $_SESSION['admin_muted_words'][] = ['word' => $word, 'reason' => $reason];
+    return [true, 'Word/phrase added successfully!'];
+}
+
+/**
+ * Checks if a word/phrase is already muted.
+ * @param string $word The word or phrase to check.
+ * @return bool
+ */
+function isMutedWord($word) {
+    if (!isset($_SESSION['admin_muted_words']) || !is_array($_SESSION['admin_muted_words'])) {
+        return false;
+    }
+    foreach ($_SESSION['admin_muted_words'] as $item) {
+        if (strtolower($item['word']) === strtolower(trim($word))) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Adds a word/phrase to the muted list (callable from anywhere in PHP)
+ * @param string $word The word or phrase to mute
+ * @param string $reason The reason for muting
+ * @return array [success (bool), message (string)]
+ */
+function addWordToMute($word, $reason = '') {
+    if (isMutedWord($word)) {
+        return [false, 'This word/phrase already exists in the muted list.'];
+    }
+    $word = trim($word);
+    if ($word === '') {
+        return [false, 'Word/phrase cannot be empty.'];
+    }
+    $_SESSION['admin_muted_words'][] = ['word' => $word, 'reason' => $reason];
+    return [true, 'Word/phrase added successfully!'];
+}
+
 // Handle POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Add a new muted word/phrase
     if (isset($_POST['action']) && $_POST['action'] === 'addMutedWord') {
         $word = trim($_POST['mutedWord'] ?? '');
         $reason = trim($_POST['wordReason'] ?? '');
-
-        if (!empty($word)) {
-            // Check for duplicates
-            $isDuplicate = false;
-            foreach ($_SESSION['admin_muted_words'] as $item) {
-                if (strtolower($item['word']) === strtolower($word)) {
-                    $isDuplicate = true;
-                    break;
-                }
-            }
-
-            if (!$isDuplicate) {
-                $_SESSION['admin_muted_words'][] = ['word' => $word, 'reason' => $reason];
-                $successMsg = 'Word/phrase added successfully!';
-            } else {
-                $errorMsg = 'This word/phrase already exists in the muted list.';
-            }
+        list($success, $msg) = addMutedWord($word, $reason);
+        if ($success) {
+            $successMsg = $msg;
         } else {
-            $errorMsg = 'Word/phrase cannot be empty.';
+            $errorMsg = $msg;
         }
     }
 
@@ -52,20 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get the current list of muted words for display
 $mutedWords = $_SESSION['admin_muted_words'];
-
-// Get theme settings from session (for consistent styling with settings page)
-$adminTheme = $_SESSION['admin_theme'] ?? 'light';
-$adminCompactMode = $_SESSION['admin_compactMode'] ?? false;
-$adminHighContrast = $_SESSION['admin_highContrast'] ?? false;
-
-// Set body class based on session theme preferences
-$bodyClasses = ['admin-body'];
-if ($adminTheme === 'dark') $bodyClasses[] = 'dark-theme';
-if ($adminTheme === 'light') $bodyClasses[] = 'light-theme';
-if ($adminTheme === 'system') $bodyClasses[] = 'system-theme'; // Will be handled by JS for system preference
-if ($adminCompactMode) $bodyClasses[] = 'compact-mode';
-if ($adminHighContrast) $bodyClasses[] = 'high-contrast';
-$bodyClass = implode(' ', $bodyClasses);
 
 ?>
 <!DOCTYPE html>
@@ -576,13 +607,13 @@ $bodyClass = implode(' ', $bodyClasses);
         }
     </style>
 </head>
-<body class="<?php echo $bodyClass; ?>">
+<body class="<?php echo getThemeClasses(); ?>">
     <div class="admin-container">
         <!-- Header -->
         <header class="admin-header">
             <div class="header-left">
                 <!-- Using a placeholder image for logo -->
-                <img src="https://placehold.co/50x50/1b4332/FFFFFF?text=CvSU" alt="CVSU Logo" class="logo">
+                <img src="img/logo.png" alt="CVSU Logo" class="logo">
                 <h1>Muted Words</h1>
             </div>
             <div class="header-right">
@@ -615,8 +646,8 @@ $bodyClass = implode(' ', $bodyClasses);
             </div>
 
             <div class="back-button">
-                <a href="admin-settings.php" class="btn-back">
-                    <i class="fas fa-arrow-left"></i> Back to Admin Settings
+                <a href="admin-dashboard.php" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to Admin Dashboard
                 </a>
             </div>
         </main>
@@ -799,55 +830,51 @@ $bodyClass = implode(' ', $bodyClasses);
         }
 
         /**
-         * Handles the submission of the "Add Muted Word/Phrase" form.
-         * @param {Event} e - The form submit event.
+         * Adds a muted word/phrase via AJAX (can be called from anywhere in JS)
+         * @param {string} word - The word or phrase to mute
+         * @param {string} reason - The reason for muting
+         * @returns {Promise<void>}
          */
-        async function handleAddWord(e) {
-            e.preventDefault(); // Prevent default form submission
-
-            const word = mutedWordInput.value.trim();
-            const reason = wordReasonTextarea.value.trim();
-
+        async function addMutedWordJS(word, reason) {
             if (!word) {
                 showNotification("Please enter a word or phrase to mute.", "error");
                 return;
             }
-
             try {
                 const formData = new URLSearchParams();
                 formData.append('action', 'addMutedWord');
                 formData.append('mutedWord', word);
                 formData.append('wordReason', reason);
 
-                const response = await fetch('', { // Post to the same PHP file
+                const response = await fetch('', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formData.toString()
                 });
-
-                const textResponse = await response.text(); // Get raw text response
-                // Attempt to parse as JSON, but fall back to checking text for messages if not JSON
+                const textResponse = await response.text();
                 try {
                     const data = JSON.parse(textResponse);
                     if (data.success) {
                         showNotification(data.message || 'Word/phrase added successfully!', 'success');
-                        // Refresh the page to get updated session data
                         location.reload();
                     } else {
                         showNotification(data.message || 'Failed to add word/phrase.', 'error');
                     }
                 } catch (jsonError) {
-                    // If not JSON, it means PHP redirected or returned plain HTML,
-                    // which indicates success for this simple page.
-                    // Reload to reflect changes handled by PHP.
                     location.reload();
                 }
             } catch (error) {
                 console.error('Error adding muted word:', error);
                 showNotification('An error occurred while adding the word/phrase.', 'error');
             }
+        }
+
+        // Update form handler to use the new function
+        async function handleAddWord(e) {
+            e.preventDefault();
+            const word = mutedWordInput.value.trim();
+            const reason = wordReasonTextarea.value.trim();
+            await addMutedWordJS(word, reason);
         }
 
         /**

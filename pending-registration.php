@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<?php
+include_once "theme-manager.php";
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,12 +9,12 @@
     <link rel="stylesheet" href="admin-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="admin-body">
+<body class="<?php echo getThemeClasses(); ?>">
     <div class="admin-container">
         <!-- Header -->
         <header class="admin-header">
             <div class="header-left">
-                <img src="Bulletin System/img/logo.png" alt="CVSU Logo" class="logo">
+                <img src="img/logo.png" alt="CVSU Logo" class="logo">
                 <h1>Pending Registration</h1>
             </div>
         </header>
