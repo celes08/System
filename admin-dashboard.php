@@ -31,7 +31,7 @@ if (isset($_SESSION['admin_highContrast']) && $_SESSION['admin_highContrast']) {
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    /* box-sizing: border-box; */
   }
   
   body.admin-body {
@@ -229,7 +229,7 @@ if (isset($_SESSION['admin_highContrast']) && $_SESSION['admin_highContrast']) {
     color: #fff;
   }
   body.dark-theme .dashboard-card.chart-card .card-content h3 {
-    color: #fff;
+    color: #fff !important;
   }
   
   .dashboard-card:hover {
@@ -945,7 +945,6 @@ if (isset($_SESSION['admin_highContrast']) && $_SESSION['admin_highContrast']) {
 </head>
 <body class="<?php echo $bodyClass; ?>"></body>
     <div class="admin-container">
-        <!-- Header -->
         <header class="admin-header">
             <div class="header-left">
                 <img src="img/logo.png" alt="CVSU Logo" class="logo">
@@ -965,10 +964,8 @@ if (isset($_SESSION['admin_highContrast']) && $_SESSION['admin_highContrast']) {
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="admin-main">
             <div class="dashboard-grid">
-                <!-- First Row - User Management -->
                 <div class="dashboard-card" onclick="navigateTo('registered-users.php')">
                     <div class="card-icon">
                         <i class="fas fa-users"></i>
@@ -999,7 +996,6 @@ if (isset($_SESSION['admin_highContrast']) && $_SESSION['admin_highContrast']) {
                     </div>
                 </div>
 
-                <!-- Second Row - Analytics & Management -->
                 <div class="dashboard-card" onclick="openAdminLogs()">
                     <div class="card-icon">
                         <i class="fas fa-clipboard-list"></i>
@@ -1010,13 +1006,13 @@ if (isset($_SESSION['admin_highContrast']) && $_SESSION['admin_highContrast']) {
                     </div>
                 </div>
 
-                <div class="dashboard-card chart-card" onclick="openDepartmentModal()" style="flex-direction: row; align-items: center; justify-content: flex-start;">
-                    <div class="card-icon" style="margin-bottom: 0; align-self: center;">
-                        <i class="fas fa-chart-pie" style="color:white;"></i>
+                <div class="dashboard-card" onclick="openDepartmentModal()">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-pie"></i>
                     </div>
-                    <div class="card-content" style="width:100%; display:flex; flex-direction:row; align-items:center; justify-content:flex-start; gap: 1rem;">
-                        <h3 style="margin:0; color:#1b4332; font-size:1.3rem; font-weight:600; text-align:left;">Users per Department</h3>
-                        <canvas id="departmentChart"></canvas>
+                    <div class="card-content">
+                        <h2>Users</h2>
+                        <p>Users per Department</p>
                     </div>
                 </div>
 
@@ -1032,13 +1028,11 @@ if (isset($_SESSION['admin_highContrast']) && $_SESSION['admin_highContrast']) {
             </div>
         </main>
 
-    <!-- Floating Help Button -->
     <div class="floating-help-btn" onclick="navigateTo('admin-help.php')" title="Help Tickets">
         <i class="fas fa-life-ring"></i>
         <span class="help-badge" id="helpTicketsBadge">15</span>
     </div>
 
-    <!-- Add Department Modal -->
     <div class="modal" id="departmentModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1062,14 +1056,12 @@ if (isset($_SESSION['admin_highContrast']) && $_SESSION['admin_highContrast']) {
         </div>
     </div>
 
-    <!-- Notification Toast -->
     <div class="notification-toast" id="notificationToast">
         <i class="toast-icon"></i>
         <span class="toast-message"></span>
         <button class="toast-close">&times;</button>
     </div>
 
-    <!-- <script src="admin-dashboard.js"></script> -->
     <script>
         function navigateTo(url) {
             window.location.href = url;
@@ -1083,6 +1075,7 @@ if (isset($_SESSION['admin_highContrast']) && $_SESSION['admin_highContrast']) {
         function openAdminLogs() {
             window.location.href = 'admin-logs.php';
         }
+
     </script>
 </body>
 </html>
