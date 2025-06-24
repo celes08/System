@@ -1,175 +1,132 @@
 <?php
-// index.php
-// This file handles displaying both login and signup forms,
-// and processes the signup submission within the same file.
-
-// Include your database connection file.
-// Ensure 'connections.php' correctly defines a variable like $con (most likely).
 include("connections.php");
 
-// Set up robust error reporting for debugging (REMOVE OR COMMENT OUT IN PRODUCTION)
+// Error reporting for development (disable in production)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Initialize variables for displaying messages
-$errors = [];          // To store validation or database errors
-$success_message = ''; // To store success messages
+$errors = [];
+$success_message = '';
+
+$firstName = $_POST['firstName'] ?? '';
+$middleName = $_POST['middleName'] ?? '';
+$lastName = $_POST['lastName'] ?? '';
+$email = $_POST['email'] ?? '';
+$dateOfBirth = $_POST['dateOfBirth'] ?? '';
+$studentNumber = $_POST['studentNumber'] ?? '';
+$department = $_POST['department'] ?? '';
+$password = '';
+$confirmPassword = '';
+$loginEmail = $_POST['loginEmail'] ?? '';
+$username = trim($_POST['username'] ?? '');
 
 // --- Process Signup Form Submission ---
-// Check if the signup form was submitted (by checking for 'firstName' which is unique to signup)
-// and if the request method is POST.
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signupButton'])) {
-
-    // Sanitize and validate inputs
-    $first_name = trim($_POST['firstName'] ?? '');
-    $middle_name = trim($_POST['middleName'] ?? '');
-    $last_name = trim($_POST['lastName'] ?? '');
-    $email = trim($_POST['email'] ?? ''); // 'email' for signup form
-    $date_of_birth = trim($_POST['dateOfBirth'] ?? '');
-    $student_number = trim($_POST['studentNumber'] ?? '');
-    $department_id = trim($_POST['department'] ?? '');
-    $password = $_POST['password'] ?? ''; // 'password' for signup form
+    $firstName = trim($_POST['firstName'] ?? '');
+    $middleName = trim($_POST['middleName'] ?? '');
+    $lastName = trim($_POST['lastName'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $dateOfBirth = trim($_POST['dateOfBirth'] ?? '');
+    $studentNumber = trim($_POST['studentNumber'] ?? '');
+    $department = trim($_POST['department'] ?? '');
+    $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';
+    $username = trim($_POST['username'] ?? '');
 
-    // Basic Server-Side Validation
-    if (empty($first_name)) $errors[] = "First name is required.";
-    if (empty($last_name)) $errors[] = "Last name is required.";
+    // Server-side validation
+    if (empty($firstName)) $errors[] = "First name is required.";
+    if (empty($middleName)) $errors[] = "Middle name is required.";
+    if (empty($lastName)) $errors[] = "Last name is required.";
     if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Valid email is required.";
-    if (empty($date_of_birth)) $errors[] = "Date of Birth is required.";
-    if (empty($student_number)) $errors[] = "Student number is required.";
-    if (empty($department_id)) $errors[] = "Department is required.";
-    if (empty($password)) $errors[] = "Password is required.";
+    if (empty($dateOfBirth)) $errors[] = "Date of birth is required.";
+    if (empty($studentNumber)) $errors[] = "Student number is required.";
+    if (empty($department)) $errors[] = "Department is required.";
+    if (empty($password) || strlen($password) < 6) $errors[] = "Password must be at least 6 characters.";
     if ($password !== $confirmPassword) $errors[] = "Passwords do not match.";
-    if (strlen($password) < 6) $errors[] = "Password must be at least 6 characters long.";
+    if (empty($username)) $errors[] = "Username is required.";
+    if (!preg_match('/^[A-Za-z0-9_]{3,20}$/', $username)) $errors[] = "Username must be 3-20 characters, letters, numbers, or underscores only.";
 
-    // Duplicate check
+    // Check for duplicate email
     if (empty($errors)) {
-        $check = $con->prepare("SELECT user_id FROM users WHERE email = ? OR student_number = ?");
-        $check->bind_param("ss", $email, $student_number);
-        $check->execute();
-        $check->store_result();
-        if ($check->num_rows > 0) {
-            $errors[] = "An account with this email or student number already exists.";
-        }
-        $check->close();
+        $stmt = $con->prepare("SELECT email FROM signuptbl WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) $errors[] = "Email already registered.";
+        $stmt->close();
     }
 
-    // If no validation errors, proceed with database insertion
+    // Check for duplicate username
     if (empty($errors)) {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $con->prepare("SELECT username FROM signuptbl WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) $errors[] = "Username already taken.";
+        $stmt->close();
+    }
 
-        // Prepare the SQL statement for inserting a new user into 'users'.
-        $sql = "INSERT INTO users (first_name, middle_name, last_name, email, date_of_birth, student_number, department_id, password_hash, account_status, role_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending', 1)";
-        $stmt = $con->prepare($sql);
-
-        if ($stmt === false) {
-            error_log("Failed to prepare signup statement: " . $con->error);
-            $errors[] = "An internal server error occurred during registration. Please try again later. (Error P1)";
+    // Insert into database if no errors
+    if (empty($errors)) {
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $con->prepare("INSERT INTO signuptbl (first_name, middle_name, last_name, username, email, date_of_birth, student_number, department, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssssss", $firstName, $middleName, $lastName, $username, $email, $dateOfBirth, $studentNumber, $department, $hashedPassword);
+        if ($stmt->execute()) {
+            $success_message = "Signup successful! You may now log in.";
+            $firstName = $middleName = $lastName = $email = $dateOfBirth = $studentNumber = $department = $username = '';
         } else {
-            $stmt->bind_param("ssssssis", $first_name, $middle_name, $last_name, $email, $date_of_birth, $student_number, $department_id, $hashed_password);
-
-            if ($stmt->execute()) {
-                $success_message = "Registration successful! You can now log in.";
-                // Clear form fields after successful registration
-                $first_name = $middle_name = $last_name = $email = $date_of_birth = $student_number = $department_id = $password = $confirmPassword = '';
-                $active_tab = 'login';
-            } else {
-                error_log("Error during registration execution: " . $stmt->error);
-                if ($stmt->errno == 1062) { // MySQL error code for duplicate entry on a unique key
-                    $errors[] = "An account with this email or student number already exists.";
-                } else {
-                    $errors[] = "Registration failed due to a database error. Please try again. (Error E1)";
-                }
-                $active_tab = 'signup';
-            }
-            $stmt->close();
+            $errors[] = "Database error: " . $stmt->error;
         }
-    } else {
-        $active_tab = 'signup';
+        $stmt->close();
     }
 }
 
 // --- Process Login Form Submission ---
-// Check if the login form was submitted (by checking for 'email' and 'password' which are common,
-// but the 'loginButton' is unique to login form to differentiate from signup form's submit)
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['loginButton'])) { // Assumes loginButton has a name attribute or similar unique identifier
-    // Note: The original HTML for loginForm did not have a 'name' attribute on the submit button.
-    // I'm adding `name="loginButton"` to the login submit button in the HTML below for this check.
-    // If not, you'd need a different way to distinguish, like an hidden input.
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['loginButton'])) {
+    $loginEmail = trim($_POST['loginEmail'] ?? '');
+    $loginPassword = $_POST['loginPassword'] ?? '';
 
-    // Sanitize inputs
-    $loginEmail = trim($_POST['email'] ?? ''); // 'email' for login form
-    $loginPassword = $_POST['password'] ?? ''; // 'password' for login form
-
-    // Initialize login-specific errors
-    $loginErrors = [];
-
-    // Basic validation
-    if (empty($loginEmail) || !filter_var($loginEmail, FILTER_VALIDATE_EMAIL)) $loginErrors[] = "Valid email is required for login.";
-    if (empty($loginPassword)) $loginErrors[] = "Password is required for login.";
-
-    if (empty($loginErrors)) {
-        $sql = "SELECT user_id, email, password_hash, first_name, last_name, department_id FROM users WHERE email = ?";
-        $stmt = $con->prepare($sql);
-
-        if ($stmt === false) {
-            error_log("Failed to prepare login statement: " . $con->error);
-            $loginErrors[] = "An internal error occurred during login. Please try again. (Error L1)";
-        } else {
-            $stmt->bind_param("s", $loginEmail);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows == 1) {
-                $user = $result->fetch_assoc();
-                if (password_verify($loginPassword, $user['password_hash'])) {
-                    // Login successful! Start session and redirect.
-                    session_start();
-                    $_SESSION['user_id'] = $user['user_id'];
-                    $_SESSION['user_email'] = $user['email'];
-                    $_SESSION['user_first_name'] = $user['first_name'];
-                    $_SESSION['user_last_name'] = $user['last_name'];
-                    $_SESSION['user_department_id'] = $user['department_id'];
-
-                    header("Location: dashboard.php"); // Redirect to dashboard
-                    exit();
+    if (empty($loginEmail) || empty($loginPassword)) {
+        $errors[] = "Email and password are required for login.";
+    } else {
+        $stmt = $con->prepare("SELECT user_id, password FROM signuptbl WHERE email = ?");
+        $stmt->bind_param("s", $loginEmail);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows === 1) {
+            $stmt->bind_result($userId, $hashedPassword);
+            $stmt->fetch();
+            if (password_verify($loginPassword, $hashedPassword)) {
+                // Successful login
+                session_start();
+                $_SESSION['user_id'] = $userId;
+                $_SESSION['email'] = $loginEmail;
+                if (!isset($_SESSION['accepted_terms']) || !$_SESSION['accepted_terms']) {
+                    header("Location: terms.php");
                 } else {
-                    $loginErrors[] = "Invalid password.";
+                    header("Location: dashboard.php");
                 }
+                exit();
             } else {
-                $loginErrors[] = "No account found with that email address.";
+                $errors[] = "Incorrect password.";
             }
-            $stmt->close();
+        } else {
+            $errors[] = "No account found with that email.";
         }
-    }
-    // If login failed, add loginErrors to the main errors array for display
-    $errors = array_merge($errors, $loginErrors);
-    $active_tab = 'login';
-}
-
-// --- Handle URL-based notifications (from previous redirects like logout) ---
-// This ensures messages from other pages (like dashboard.php after logout) are still displayed.
-if (isset($_GET['status']) && isset($_GET['message'])) {
-    if ($_GET['status'] === 'success') {
-        $success_message = htmlspecialchars(urldecode($_GET['message']));
-    } elseif ($_GET['status'] === 'error') {
-        $errors[] = htmlspecialchars(urldecode($_GET['message']));
+        $stmt->close();
     }
 }
 
-// --- Handle tab switching ---
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['showLogin'])) {
-    $active_tab = 'login';
-}
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['showSignup'])) {
+// Determine which tab should be active
+$active_tab = 'login';
+if (!empty($errors) && isset($_POST['signupButton'])) {
     $active_tab = 'signup';
 }
-
-// Default tab logic
-if (!isset($active_tab)) {
-    $active_tab = (!empty($errors) && isset($_POST['signupButton'])) ? 'signup' : 'login';
+if (!empty($errors) && isset($_POST['loginButton'])) {
+    $active_tab = 'login';
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -178,64 +135,290 @@ if (!isset($active_tab)) {
     <title>CVSU Department Bulletin Board System</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Basic styling for notification, ensure this is included in your styles.css */
-        .notification {
-            display: none; /* Hidden by default, shown by JS */
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            background: #e9ecef;
+        }
+        .background-image {
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 25px;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            z-index: 1000;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            object-fit: cover;
+            z-index: -2;
+            filter: brightness(0.50);
+            background: linear-gradient(rgba(4, 9, 30, 0.85), rgba(4, 9, 30, 0.85)), url('img/Silang-Campus-scaled.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 1.2s cubic-bezier(.4,0,.2,1);
+            gap: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .left-panel, .right-panel {
+            min-height: 480px;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 0;
+        }
+        .left-panel {
+            background: rgba(22, 53, 32, 0.82);
+            color: #fff;
+            border-radius: 22px 0 0 22px;
+            padding: 54px 38px 54px 38px;
+            max-width: 370px;
             min-width: 300px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .logo-container {
+            margin-bottom: 18px;
+        }
+        .logo {
+            width: 90px;
+            height: 90px;
+            display: block;
+            margin: 0 auto 10px auto;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.12));
+        }
+        .left-panel h1 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            margin: 0 0 10px 0;
             text-align: center;
+            line-height: 1.3;
+            letter-spacing: 0.5px;
+            color: #fff !important;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.18), 0 1px 0 #222;
+        }
+        .left-panel p {
+            font-size: 1.08rem;
+            font-weight: 400;
+            margin: 0;
+            text-align: center;
+            color: #e0e0e0;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        }
+        .right-panel {
+            background: rgba(255,255,255,0.82);
+            border-radius: 0 22px 22px 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+            padding: 22px 36px 36px 36px;
+            min-width: 350px;
+            max-width: 400px;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            animation: fadeIn 1.2s cubic-bezier(.4,0,.2,1);
+            position: relative;
+        }
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+            margin-top: 0;
+            position: relative;
+            top: 0;
+            z-index: 2;
+        }
+        .tab {
+            border: none;
+            outline: none;
+            padding: 12px 38px;
+            border-radius: 32px;
+            font-size: 1.08rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: transparent;
+            color: #1b4332;
+            transition: background 0.25s, color 0.25s, box-shadow 0.2s;
+            z-index: 1;
+            position: relative;
+        }
+        .tab.active {
+            background: #1b4332;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(27,67,50,0.10);
+        }
+        .tab.inactive {
+            background: transparent;
+            color: #1b4332;
+        }
+        .form-container {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 340px;
+            padding: 0;
+        }
+        .form-container h2 {
+            font-size: 1.18rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: #1b4332;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .form-group {
+            margin-bottom: 13px;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-size: 1.01rem;
+            font-weight: 600;
+            margin-bottom: 7px;
+            color: #1b4332;
+            letter-spacing: 0.2px;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 13px 15px;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            font-size: 1.01rem;
+            background: #f8f9fa;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #1b4332;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(27,67,50,0.10);
+        }
+        .form-row {
+            display: flex;
+            gap: 8px;
+        }
+        .form-row .form-group.half {
+            flex: 1 1 0;
+        }
+        .login-button {
+            width: 100%;
+            padding: 11px 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border-radius: 9px;
+            background: #1b4332;
+            color: #fff;
+            border: none;
+            margin-top: 6px;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(27,67,50,0.08);
+        }
+        .login-button:hover, .login-button:focus {
+            background: #14532d;
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 4px 16px rgba(27,67,50,0.13);
+        }
+        .notification {
+            display: block;
+            position: static;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            font-size: 1rem;
+            padding: 12px 18px;
         }
         .notification.success {
-            background-color: #4CAF50; /* Green */
+            background: #d1fae5;
+            color: #065f46;
+            border: 1.5px solid #10b981;
         }
         .notification.error {
-            background-color: #f44336; /* Red */
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1.5px solid #ef4444;
         }
-        .notification-close {
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            background: none;
-            border: none;
+        .footer {
+            text-align: center;
+            color: #fff;
+            font-size: 0.98rem;
+            position: fixed;
+            bottom: 0; left: 0; width: 100vw;
+            background: rgba(27,67,50,0.85);
+            padding: 10px 0;
+            z-index: 10;
         }
-        .hidden { display: none !important; }
-        .tab.active { background-color: #0056b3; color: white; }
-        .tab.inactive { background-color: #e0e0e0; color: #555; }
-        .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #fff;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: none;
-            margin: 0 auto;
+        @media (max-width: 900px) {
+            .main-container { flex-direction: column; gap: 0; }
+            .left-panel, .right-panel {
+                border-radius: 22px 22px 0 0;
+                min-width: unset;
+                max-width: 100vw;
+                height: auto;
+                margin: 0;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            .right-panel { border-radius: 0 0 22px 22px; }
         }
-        .button-text {
-            display: inline-block;
+        @media (max-width: 600px) {
+            .main-container { flex-direction: column; gap: 0; }
+            .left-panel, .right-panel {
+                border-radius: 0;
+                min-width: unset;
+                max-width: 100vw;
+                padding: 24px 8px;
+                height: auto;
+                margin: 0;
+            }
+            .right-panel { border-radius: 0 0 22px 22px; }
+            .footer { font-size: 0.9rem; }
+            .form-container {
+                max-width: 98vw;
+                padding: 0 2vw;
+            }
+        }
+        /* Only the form fields scroll, not the tabs or heading */
+        #signupForm.form-container {
+            max-height: 52vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #b5b5b5 #f8f9fa;
+            padding-bottom: 8px;
+        }
+        #signupForm.form-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        #signupForm.form-container::-webkit-scrollbar-thumb {
+            background: #b5b5b5;
+            border-radius: 4px;
+        }
+        #signupForm.form-container::-webkit-scrollbar-track {
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        @media (max-width: 600px) {
+            #signupForm.form-container {
+                max-height: 40vh;
+            }
+        }
+        .signup-scroll-area {
+            max-height: 52vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #b5b5b5 #f8f9fa;
+            padding-bottom: 8px;
+        }
+        @media (max-width: 600px) {
+            .signup-scroll-area {
+                max-height: 40vh;
+            }
         }
     </style>
 </head>
 <body>
     <img src="img/Silang-Campus-scaled.jpg" alt="Campus aerial view" class="background-image">
-
     <div class="main-container">
         <div class="left-panel">
             <div class="logo-container">
@@ -246,119 +429,97 @@ if (!isset($active_tab)) {
         </div>
 
         <div class="right-panel">
-            <div class="tabs">
-                <div class="tabs-container">
-                    <form method="post" style="display:inline;">
-                        <button type="submit" name="showLogin" class="tab <?php echo ($active_tab === 'login' ? 'active' : 'inactive'); ?>">Login</button>
-                    </form>
-                    <form method="post" style="display:inline;">
-                        <button type="submit" name="showSignup" class="tab <?php echo ($active_tab === 'signup' ? 'active' : 'inactive'); ?>">Sign Up</button>
-                    </form>
-                </div>
+            <div class="tabs-container">
+                <button class="tab <?php echo $active_tab === 'login' ? 'active' : 'inactive'; ?>" id="loginTab">Login</button>
+                <button class="tab <?php echo $active_tab === 'signup' ? 'active' : 'inactive'; ?>" id="signupTab">Sign Up</button>
             </div>
 
-            <div class="form-container<?php echo ($active_tab === 'signup' ? ' hidden' : ''); ?>" id="loginForm">
+            <?php if (!empty($errors)): ?>
+                <div class="notification error">
+                    <?php foreach ($errors as $e) echo htmlspecialchars($e) . "<br>"; ?>
+                </div>
+            <?php endif; ?>
+            
+            <?php if ($success_message): ?>
+                <div class="notification success">
+                    <?php echo htmlspecialchars($success_message); ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Login Form -->
+            <div class="form-container <?php echo $active_tab === 'login' ? '' : 'hidden'; ?>" id="loginForm">
                 <h2>Login to your account</h2>
-
-                <form id="loginFormElement" action="" method="POST">
+                <form method="POST" action="">
                     <div class="form-group">
-                        <label for="email">Email address</label>
-                        <input type="email" id="email" name="email" placeholder="your@email.com" value="<?php echo htmlspecialchars($loginEmail ?? ''); ?>" required>
-                        <span class="error-message" id="emailError"></span>
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" name="loginEmail" value="<?php echo htmlspecialchars($loginEmail); ?>" required>
                     </div>
-
                     <div class="form-group">
-                        <div class="form-header">
-                            <label for="password">Password</label>
-                            <a href="#" id="forgotPassword">Forget password?</a>
-                        </div>
-                        <input type="password" id="password" name="password" placeholder="Enter password" required>
-                        <span class="error-message" id="passwordError"></span>
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" name="loginPassword" required>
                     </div>
-
-                    <div class="checkbox-container">
-                        <input type="checkbox" id="remember" name="remember">
-                        <label for="remember">Remember me</label>
-                    </div>
-
-                    <button type="submit" class="login-button" id="loginButton" name="loginButton" value="1">
-                        <span class="button-text">Login</span>
-                        <span class="loading-spinner" id="loadingSpinner"></span>
-                    </button>
+                    <button type="submit" name="loginButton" class="login-button">Login</button>
                 </form>
             </div>
 
-            <div class="form-container<?php echo ($active_tab === 'login' ? ' hidden' : ''); ?>" id="signupForm">
+            <!-- Signup Form -->
+            <div class="form-container <?php echo $active_tab === 'signup' ? '' : 'hidden'; ?>" id="signupForm">
                 <h2>Create an account</h2>
-
-                <form id="signupFormElement" action="" method="POST">
+                <div class="signup-scroll-area">
+                <form method="POST" action="">
                     <div class="form-row">
                         <div class="form-group half">
                             <label for="firstName">First Name</label>
-                            <input type="text" id="firstName" name="firstName" placeholder="Enter first name" value="<?php echo htmlspecialchars($first_name ?? ''); ?>" required>
-                            <span class="error-message" id="firstNameError"></span>
-                        </div>
-                        <div class="form-group half">
-                            <label for="middleName">Middle Name</label>
-                            <input type="text" id="middleName" name="middleName" placeholder="Enter middle name" value="<?php echo htmlspecialchars($middle_name ?? ''); ?>">
-                            <span class="error-message" id="middleNameError"></span>
+                            <input type="text" id="firstName" name="firstName" value="<?php echo htmlspecialchars($firstName); ?>" required>
                         </div>
                         <div class="form-group half">
                             <label for="lastName">Last Name</label>
-                            <input type="text" id="lastName" name="lastName" placeholder="Enter last name" value="<?php echo htmlspecialchars($last_name ?? ''); ?>" required>
-                            <span class="error-message" id="lastNameError"></span>
+                            <input type="text" id="lastName" name="lastName" value="<?php echo htmlspecialchars($lastName); ?>" required>
                         </div>
                     </div>
-
                     <div class="form-group">
-                        <label for="signupEmail">Email address</label>
-                        <input type="email" id="signupEmail" name="email" placeholder="your@email.com" value="<?php echo htmlspecialchars($email ?? ''); ?>" required>
-                        <span class="error-message" id="signupEmailError"></span>
+                        <label for="middleName">Middle Name</label>
+                        <input type="text" id="middleName" name="middleName" value="<?php echo htmlspecialchars($middleName); ?>">
                     </div>
-
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
+                    </div>
                     <div class="form-row">
                         <div class="form-group half">
                             <label for="dateOfBirth">Date of Birth</label>
-                            <input type="date" id="dateOfBirth" name="dateOfBirth" value="<?php echo htmlspecialchars($date_of_birth ?? ''); ?>" required>
-                            <span class="error-message" id="dateOfBirthError"></span>
+                            <input type="date" id="dateOfBirth" name="dateOfBirth" value="<?php echo htmlspecialchars($dateOfBirth); ?>" required>
                         </div>
                         <div class="form-group half">
                             <label for="studentNumber">Student Number</label>
-                            <input type="text" id="studentNumber" name="studentNumber" placeholder="Enter Student Number" value="<?php echo htmlspecialchars($student_number ?? ''); ?>" required>
-                            <span class="error-message" id="studentNumberError"></span>
+                            <input type="text" id="studentNumber" name="studentNumber" value="<?php echo htmlspecialchars($studentNumber); ?>" required>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label for="department">Department</label>
                         <select id="department" name="department" required>
-                            <option value="" disabled selected>Select department</option>
-                            <option value="1" <?php echo (isset($department_id) && $department_id == '1' ? 'selected' : ''); ?>>DIT</option>
-                            <option value="2" <?php echo (isset($department_id) && $department_id == '2' ? 'selected' : ''); ?>>DOM</option>
-                            <option value="3" <?php echo (isset($department_id) && $department_id == '3' ? 'selected' : ''); ?>>DAS</option>
-                            <option value="4" <?php echo (isset($department_id) && $department_id == '4' ? 'selected' : ''); ?>>TED</option>
+                            <option value="">Select Department</option>
+                            <option value="DIT" <?php echo ($department === 'DIT') ? 'selected' : ''; ?>>DIT</option>
+                            <option value="DOM" <?php echo ($department === 'DOM') ? 'selected' : ''; ?>>DOM</option>
+                            <option value="DAS" <?php echo ($department === 'DAS') ? 'selected' : ''; ?>>DAS</option>
+                            <option value="TED" <?php echo ($department === 'TED') ? 'selected' : ''; ?>>TED</option>
                         </select>
-                        <span class="select-arrow">▼</span>
-                        <span class="error-message" id="departmentError"></span>
                     </div>
-
                     <div class="form-group">
-                        <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" name="password" placeholder="Enter password" required>
-                        <span class="error-message" id="signupPasswordError"></span>
+                        <label for="password">Password (min 6 chars)</label>
+                        <input type="password" id="password" name="password" required>
                     </div>
-
                     <div class="form-group">
-                        <label for="confirmPassword">Re-enter Password</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password" required>
-                        <span class="error-message" id="confirmPasswordError"></span>
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
                     </div>
-
-                    <button type="submit" class="login-button" id="signupButton" name="signupButton" value="1">
-                        <span class="button-text">Sign Up</span>
-                        <span class="loading-spinner" id="signupLoadingSpinner"></span>
-                    </button>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($username); ?>" required pattern="[A-Za-z0-9_]{3,20}" title="3-20 characters, letters, numbers, or underscores only">
+                    </div>
+                    <button type="submit" name="signupButton" class="login-button">Sign Up</button>
                 </form>
+                </div>
             </div>
         </div>
     </div>
@@ -367,14 +528,31 @@ if (!isset($active_tab)) {
         <p>© 2025 School Bulletin Board System. All rights reserved.</p>
     </div>
 
-    <div class="notification" id="notification" style="<?php echo (!empty($success_message) || !empty($errors)) ? 'display:block;' : ''; ?> <?php echo (!empty($errors)) ? 'background-color:#f44336;' : 'background-color:#4CAF50;'; ?>">
-        <span id="notificationMessage">
-            <?php
-            if (!empty($success_message)) echo htmlspecialchars($success_message);
-            if (!empty($errors)) foreach ($errors as $e) echo htmlspecialchars($e) . "<br>";
-            ?>
-        </span>
-        <button class="notification-close" id="notificationClose" onclick="this.parentElement.style.display='none';">&times;</button>
-    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginTab = document.getElementById('loginTab');
+            const signupTab = document.getElementById('signupTab');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+
+            loginTab.addEventListener('click', function() {
+                loginTab.classList.add('active');
+                loginTab.classList.remove('inactive');
+                signupTab.classList.add('inactive');
+                signupTab.classList.remove('active');
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+            });
+
+            signupTab.addEventListener('click', function() {
+                signupTab.classList.add('active');
+                signupTab.classList.remove('inactive');
+                loginTab.classList.add('inactive');
+                loginTab.classList.remove('active');
+                signupForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            });
+        });
+    </script>
 </body>
 </html>
