@@ -1,6 +1,13 @@
 <?php
 include("user_session.php");
 requireLogin();
+include("connections.php");
+include("post-modal-shared.php");
+$user_id = $_SESSION['user_id'];
+$user_department = $_SESSION['user_department'] ?? '';
+$filter = $_GET['filter'] ?? 'all';
+$con->query("UPDATE notifications SET is_read = 1, read_at = NOW() WHERE user_id = $user_id AND is_read = 0");
+echo '<!-- Logged in as user_id: ' . $_SESSION['user_id'] . ' -->';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,9 +17,16 @@ requireLogin();
     <title>Notifications - CVSU Department Bulletin Board System</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="notifications.css">
+    <link rel="stylesheet" href="post-modal.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="dashboard-body">
+<body class="dashboard-body<?php
+if (isset($_SESSION['theme'])) {
+    echo ' ' . htmlspecialchars($_SESSION['theme']) . '-theme';
+} else {
+    echo ' system-theme';
+}
+?>">
     <div class="dashboard-container">
         <!-- Left Sidebar Navigation - Keep unchanged as requested -->
         <aside class="sidebar">
@@ -41,9 +55,11 @@ requireLogin();
             </nav>
             
             <div class="post-button-container">
-                <button class="post-button">
-                    <i class="fas fa-plus"></i> Post
-                </button>
+                <form method="post" style="margin:0;">
+                    <button class="post-button" name="showPostModal" type="submit">
+                        <i class="fas fa-plus"></i> Post
+                    </button>
+                </form>
             </div>
             
             <div class="sidebar-footer">
@@ -55,7 +71,17 @@ requireLogin();
                 
                 <div class="user-profile">
                     <div class="user-avatar">
-                        <img src="img/avatar-placeholder.png" alt="User Avatar">
+                        <?php
+                        $profilePic = $currentUser['profile_picture'] ?? '';
+                        if ($profilePic) {
+                            $profilePic = preg_replace('#^uploads/#', '', $profilePic);
+                            $imgSrc = 'uploads/' . htmlspecialchars($profilePic);
+                        } else {
+                            $initials = htmlspecialchars(substr($currentUser['fullName'], 0, 1));
+                            $imgSrc = 'https://placehold.co/36x36/cccccc/000000?text=' . $initials;
+                        }
+                        ?>
+                        <img src="<?php echo $imgSrc; ?>" alt="User Avatar">
                     </div>
                     <div class="user-info">
                         <h4><?php echo htmlspecialchars($currentUser['fullName']); ?></h4>
@@ -82,13 +108,41 @@ requireLogin();
                     <button class="notification-tab">Mentions</button>
                 </div>
                 
-                <div class="notifications-list empty">
-                    <!-- Empty state - no notifications -->
-                    <div class="empty-notifications">
-                        <i class="fas fa-bell empty-icon"></i>
-                        <h2>No Notifications Yet</h2>
-                        <p>You don't have any notifications at this time.</p>
-                    </div>
+                <div class="notifications-filter" style="margin-bottom: 16px;">
+                    <form method="get" style="display:inline;">
+                        <select name="filter" onchange="this.form.submit()">
+                            <option value="all" <?php if($filter==='all') echo 'selected'; ?>>All Notifications</option>
+                            <option value="department" <?php if($filter==='department') echo 'selected'; ?>>My Department Only</option>
+                        </select>
+                    </form>
+                </div>
+                
+                <div class="notifications-list">
+                    <?php
+                    $where = "user_id = $user_id";
+                    if ($filter === 'department' && !empty($user_department)) {
+                        $where .= " AND (SELECT department FROM signuptbl WHERE user_id = $user_id) = '$user_department'";
+                    }
+                    $result = $con->query("SELECT * FROM notifications WHERE $where ORDER BY created_at DESC");
+                    echo '<!-- Found ' . $result->num_rows . ' notifications for user_id ' . $user_id . ' -->';
+                    ?>
+                    <?php
+                    if ($result && $result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<div class='notification'>";
+                            echo htmlspecialchars($row['message']);
+                            if ($row['related_post_id']) {
+                                echo " <a href='dashboard.php?post_id=" . $row['related_post_id'] . "'>View</a>";
+                            }
+                            if (!$row['is_read']) {
+                                echo " <span class='unread-badge'>New</span>";
+                            }
+                            echo "</div>";
+                        }
+                    } else {
+                        echo "<div class='empty-notifications'><i class='fas fa-bell empty-icon'></i><h2>No Notifications Yet</h2><p>You don't have any notifications at this time.</p></div>";
+                    }
+                    ?>
                 </div>
             </div>
         </main>

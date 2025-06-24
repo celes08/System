@@ -18,9 +18,15 @@ window.openModal = () => {
     }
   }
   
-  // Enhanced Post Modal Functionality
+  // Enhanced Post Modal Functionality - OPTIMIZED VERSION
   
   document.addEventListener("DOMContentLoaded", () => {
+    // Check if already initialized to prevent duplicates
+    if (window.postModalMainInitialized) {
+      return;
+    }
+    window.postModalMainInitialized = true;
+    
     const postButton = document.getElementById("postButton")
     const postModal = document.getElementById("postModal")
     const modalClose = document.getElementById("modalClose")
@@ -28,41 +34,56 @@ window.openModal = () => {
     const postForm = document.getElementById("postForm")
   
     // Open modal when post button is clicked
-    postButton.addEventListener("click", (e) => {
-      e.preventDefault()
-      openModal()
-    })
+    if (postButton && !postButton.hasAttribute("data-main-listener")) {
+      postButton.setAttribute("data-main-listener", "true")
+      postButton.addEventListener("click", (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        openModal()
+      })
+    }
   
     // Close modal when close button is clicked
-    modalClose.addEventListener("click", () => {
-      closeModal()
-    })
+    if (modalClose && !modalClose.hasAttribute("data-main-close-listener")) {
+      modalClose.setAttribute("data-main-close-listener", "true")
+      modalClose.addEventListener("click", () => {
+        closeModal()
+      })
+    }
   
     // Close modal when clicking outside the modal content
-    postModal.addEventListener("click", (e) => {
-      if (e.target === postModal) {
-        closeModal()
-      }
-    })
+    if (postModal && !postModal.hasAttribute("data-main-overlay-listener")) {
+      postModal.setAttribute("data-main-overlay-listener", "true")
+      postModal.addEventListener("click", (e) => {
+        if (e.target === postModal) {
+          closeModal()
+        }
+      })
+    }
   
     // Close modal when pressing Escape key
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && postModal.classList.contains("active")) {
+      if (e.key === "Escape" && postModal && postModal.classList.contains("active")) {
         closeModal()
       }
     })
   
     // Handle form submission
-    postForm.addEventListener("submit", (e) => {
-      e.preventDefault()
-      handlePostSubmission()
-    })
+    if (postForm && !postForm.hasAttribute("data-main-form-listener")) {
+      postForm.setAttribute("data-main-form-listener", "true")
+      postForm.addEventListener("submit", (e) => {
+        e.preventDefault()
+        handlePostSubmission()
+      })
+    }
   
     function openModal() {
+      console.log("Opening post modal...")
       window.openModal()
     }
   
     function closeModal() {
+      console.log("Closing post modal...")
       postModal.classList.remove("active")
       dashboardContainer.classList.remove("modal-open")
       document.body.style.overflow = "" // Restore scrolling

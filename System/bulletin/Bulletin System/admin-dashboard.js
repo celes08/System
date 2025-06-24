@@ -1,4 +1,3 @@
-import { Chart } from "@/components/ui/chart"
 document.addEventListener("DOMContentLoaded", () => {
   initializeDashboard()
   setupEventListeners()
@@ -16,40 +15,61 @@ function initializeDashboard() {
 }
 
 function setupEventListeners() {
+  console.log("Setting up event listeners...")
+  
   // Admin profile dropdown
   const adminProfile = document.getElementById("adminProfile")
-  adminProfile.addEventListener("click", function () {
-    this.classList.toggle("active")
-  })
+  if (adminProfile) {
+    adminProfile.addEventListener("click", function () {
+      this.classList.toggle("active")
+    })
+  }
 
   // Close dropdown when clicking outside
   document.addEventListener("click", (e) => {
-    if (!adminProfile.contains(e.target)) {
+    if (adminProfile && !adminProfile.contains(e.target)) {
       adminProfile.classList.remove("active")
     }
   })
 
   // Logout functionality
   const logoutBtn = document.getElementById("adminLogout")
-  logoutBtn.addEventListener("click", (e) => {
-    e.preventDefault()
-    logout()
-  })
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      logout()
+    })
+  }
 
   // Department modal
   const departmentModal = document.getElementById("departmentModal")
   const departmentModalClose = document.getElementById("departmentModalClose")
   const addDepartmentForm = document.getElementById("addDepartmentForm")
 
-  departmentModalClose.addEventListener("click", closeDepartmentModal)
-  addDepartmentForm.addEventListener("submit", handleAddDepartment)
+  console.log("Modal elements found:", {
+    modal: departmentModal,
+    closeBtn: departmentModalClose,
+    form: addDepartmentForm
+  })
+
+  if (departmentModalClose) {
+    departmentModalClose.addEventListener("click", closeDepartmentModal)
+  }
+  
+  if (addDepartmentForm) {
+    addDepartmentForm.addEventListener("submit", handleAddDepartment)
+  }
 
   // Close modal when clicking outside
-  departmentModal.addEventListener("click", (e) => {
-    if (e.target === departmentModal) {
-      closeDepartmentModal()
-    }
-  })
+  if (departmentModal) {
+    departmentModal.addEventListener("click", (e) => {
+      if (e.target === departmentModal) {
+        closeDepartmentModal()
+      }
+    })
+  }
+  
+  console.log("Event listeners setup complete")
 }
 
 function loadDashboardData() {
@@ -60,7 +80,7 @@ function loadDashboardData() {
   document.getElementById("pendingRegistrationCount").textContent = stats.pendingRegistrations
   document.getElementById("schoolAdminsCount").textContent = stats.schoolAdmins
   document.getElementById("reportedPostsCount").textContent = stats.reportedPosts.toString().padStart(2, "0")
-  document.getElementById("helpTicketsCount").textContent = stats.helpTickets
+  document.getElementById("helpTicketsBadge").textContent = stats.helpTickets
 }
 
 function getDashboardStats() {
@@ -75,41 +95,51 @@ function getDashboardStats() {
 }
 
 function createDepartmentChart() {
-  const ctx = document.getElementById("departmentChart").getContext("2d")
-  const departmentData = getDepartmentData()
+  try {
+    const ctx = document.getElementById("departmentChart")
+    if (!ctx) {
+      console.error("Department chart canvas not found")
+      return
+    }
+    
+    const context = ctx.getContext("2d")
+    const departmentData = getDepartmentData()
 
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: departmentData.labels,
-      datasets: [
-        {
-          label: "Users",
-          data: departmentData.data,
-          backgroundColor: ["#1b4332", "#2d5a3d", "#40916c", "#52b788"],
-          borderColor: ["#1b4332", "#2d5a3d", "#40916c", "#52b788"],
-          borderWidth: 1,
+    new Chart(context, {
+      type: "bar",
+      data: {
+        labels: departmentData.labels,
+        datasets: [
+          {
+            label: "Users",
+            data: departmentData.data,
+            backgroundColor: ["#1b4332", "#2d5a3d", "#40916c", "#52b788"],
+            borderColor: ["#1b4332", "#2d5a3d", "#40916c", "#52b788"],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 10,
+            },
+          },
         },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            stepSize: 10,
+        plugins: {
+          legend: {
+            display: false,
           },
         },
       },
-      plugins: {
-        legend: {
-          display: false,
-        },
-      },
-    },
-  })
+    })
+  } catch (error) {
+    console.error("Error creating department chart:", error)
+  }
 }
 
 function getDepartmentData() {
@@ -138,9 +168,16 @@ function navigateTo(page) {
 }
 
 function openDepartmentModal() {
+  console.log("openDepartmentModal called")
   const modal = document.getElementById("departmentModal")
-  modal.classList.add("active")
-  document.body.style.overflow = "hidden"
+  console.log("Modal element:", modal)
+  if (modal) {
+    modal.classList.add("active")
+    document.body.style.overflow = "hidden"
+    console.log("Modal should now be active")
+  } else {
+    console.error("Modal element not found!")
+  }
 }
 
 function closeDepartmentModal() {

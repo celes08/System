@@ -61,16 +61,32 @@ function setupEventListeners() {
   setupChangePasswordModal()
 
   // Theme selection
-  const themeOptions = document.querySelectorAll('input[name="theme"]')
-  themeOptions.forEach((option) => {
-    option.addEventListener("change", function () {
-      if (this.checked) {
-        applyTheme(this.value)
-        savePreference("theme", this.value)
-        showNotification("Theme updated successfully!", "success")
-      }
-    })
-  })
+  document.querySelectorAll('input[name="theme"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      const selectedTheme = this.value; // 'light', 'dark', or 'system'
+
+      // AJAX to save to server
+      fetch('save_theme.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'theme=' + encodeURIComponent(selectedTheme)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // Update body class immediately
+          document.body.classList.remove('light-theme', 'dark-theme', 'system-theme');
+          if (selectedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+          } else if (selectedTheme === 'light') {
+            document.body.classList.add('light-theme');
+          } else {
+            document.body.classList.add('system-theme');
+          }
+        }
+      });
+    });
+  });
 
   // Toggle switches
   const toggleSwitches = document.querySelectorAll(".toggle-switch input")

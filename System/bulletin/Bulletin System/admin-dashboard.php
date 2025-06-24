@@ -1,3 +1,17 @@
+<?php
+session_start();
+// Apply user settings from session (theme, appearance, etc.)
+$bodyClass = 'admin-body';
+if (isset($_SESSION['theme'])) {
+    $bodyClass .= ' ' . htmlspecialchars($_SESSION['theme']);
+}
+if (isset($_SESSION['compact_mode']) && $_SESSION['compact_mode']) {
+    $bodyClass .= ' compact-mode';
+}
+if (isset($_SESSION['high_contrast']) && $_SESSION['high_contrast']) {
+    $bodyClass .= ' high-contrast';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,12 +22,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="admin-body">
+<body class="<?php echo $bodyClass; ?>">
     <div class="admin-container">
         <!-- Header -->
         <header class="admin-header">
             <div class="header-left">
-                <img src="Bulletin System/img/logo.png" alt="CVSU Logo" class="logo">
+                <img src="img/logo.png" alt="CVSU Logo" class="logo">
                 <h1>Admin Dashboard</h1>
             </div>
             <div class="header-right">
@@ -23,7 +37,7 @@
                     </div>
                     <div class="dropdown-menu" id="adminDropdown">
                         <a href="admin-settings.php"><i class="fas fa-cog"></i> Settings</a>
-                        <a href="muted-words.pp"><i class="fas fa-ban"></i> Muted Words</a>
+                        <a href="muted-words.php"><i class="fas fa-ban"></i> Muted Words</a>
                         <a href="#" id="adminLogout"><i class="fas fa-sign-out-alt"></i> Log Out</a>
                     </div>
                 </div>
@@ -34,7 +48,7 @@
         <main class="admin-main">
             <div class="dashboard-grid">
                 <!-- First Row - User Management -->
-                <div class="dashboard-card" onclick="navigateTo('registered-users.html')">
+                <div class="dashboard-card" onclick="navigateTo('registered-users.php')">
                     <div class="card-icon">
                         <i class="fas fa-users"></i>
                     </div>
@@ -44,7 +58,7 @@
                     </div>
                 </div>
 
-                <div class="dashboard-card" onclick="navigateTo('pending-registration.html')">
+                <div class="dashboard-card" onclick="openPendingRegistration()">
                     <div class="card-icon">
                         <i class="fas fa-user-clock"></i>
                     </div>
@@ -54,7 +68,7 @@
                     </div>
                 </div>
 
-                <div class="dashboard-card" onclick="navigateTo('school-admins.html')">
+                <div class="dashboard-card" onclick="openSchoolAdmin()">
                     <div class="card-icon">
                         <i class="fas fa-user-shield"></i>
                     </div>
@@ -65,7 +79,7 @@
                 </div>
 
                 <!-- Second Row - Analytics & Management -->
-                <div class="dashboard-card" onclick="navigateTo('admin-logs.html')">
+                <div class="dashboard-card" onclick="openAdminLogs()">
                     <div class="card-icon">
                         <i class="fas fa-clipboard-list"></i>
                     </div>
@@ -82,7 +96,7 @@
                     </div>
                 </div>
 
-                <div class="dashboard-card" onclick="navigateTo('reported-posts.html')">
+                <div class="dashboard-card" onclick="navigateTo('reported-posts.php')">
                     <div class="card-icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
@@ -131,6 +145,21 @@
         <button class="toast-close">&times;</button>
     </div>
 
-    <script src="admin-dashboard.js"></script>
+    <!-- <script src="admin-dashboard.js"></script> -->
+    <script>
+        function navigateTo(url) {
+            window.location.href = url;
+        }
+        function openPendingRegistration() {
+            window.location.href = 'pending-registration.php';
+        }
+        function openSchoolAdmin() {
+            window.location.href = 'school-admins.php';
+        }
+         function openAdminLogs() {
+            window.location.href = 'admin-logs.php';
+        }
+        
+    </script>
 </body>
 </html>

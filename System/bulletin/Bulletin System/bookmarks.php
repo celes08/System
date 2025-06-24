@@ -1,6 +1,49 @@
 <?php
 include("user_session.php");
 requireLogin();
+
+// Connect to the database
+include("connections.php");
+include("post-modal-shared.php");
+
+// Fetch bookmarked posts for the current user
+$user_id = $_SESSION['user_id'];
+$bookmarked_posts = [];
+
+$sql = "SELECT p.*, u.first_name, u.last_name, u.profile_picture 
+        FROM post_bookmarks pb
+        JOIN posts p ON pb.post_id = p.post_id
+        JOIN signuptbl u ON p.user_id = u.user_id
+        WHERE pb.user_id = ?
+        ORDER BY pb.created_at DESC";
+
+$stmt = $con->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $bookmarked_posts[] = $row;
+    }
+}
+$stmt->close();
+
+// Handle Clear All Bookmarks
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_all_bookmarks'])) {
+    $user_id_to_clear = $_SESSION['user_id'];
+    
+    $delete_sql = "DELETE FROM post_bookmarks WHERE user_id = ?";
+    $delete_stmt = $con->prepare($delete_sql);
+    $delete_stmt->bind_param("i", $user_id_to_clear);
+    $delete_stmt->execute();
+    $delete_stmt->close();
+    
+    // Redirect to the same page to reflect the changes
+    header("Location: bookmarks.php");
+    exit();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,9 +53,16 @@ requireLogin();
     <title>Bookmarks - CVSU Department Bulletin Board System</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="bookmarks.css">
+    <link rel="stylesheet" href="post-modal.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="dashboard-body">
+<body class="dashboard-body<?php
+if (isset($_SESSION['theme'])) {
+    echo ' ' . htmlspecialchars($_SESSION['theme']) . '-theme';
+} else {
+    echo ' system-theme';
+}
+?>">
     <div class="dashboard-container">
         <!-- Left Sidebar Navigation - Keep unchanged as requested -->
         <aside class="sidebar">
@@ -41,9 +91,11 @@ requireLogin();
             </nav>
             
             <div class="post-button-container">
-                <button class="post-button">
-                    <i class="fas fa-plus"></i> Post
-                </button>
+                <form method="post" style="margin:0;">
+                    <button class="post-button" name="showPostModal" type="submit">
+                        <i class="fas fa-plus"></i> Post
+                    </button>
+                </form>
             </div>
             
             <div class="sidebar-footer">
@@ -55,10 +107,20 @@ requireLogin();
                 
                 <div class="user-profile">
                     <div class="user-avatar">
-                        <img src="img/avatar-placeholder.png" alt="User Avatar">
+                        <?php
+                        $profilePic = $currentUser['profile_picture'] ?? '';
+                        if ($profilePic) {
+                            $profilePic = preg_replace('#^uploads/#', '', $profilePic);
+                            $imgSrc = 'uploads/' . htmlspecialchars($profilePic);
+                        } else {
+                            $initials = htmlspecialchars(substr($currentUser['first_name'], 0, 1) . substr($currentUser['last_name'], 0, 1));
+                            $imgSrc = 'https://placehold.co/36x36/cccccc/000000?text=' . $initials;
+                        }
+                        ?>
+                        <img src="<?php echo $imgSrc; ?>" alt="User Avatar">
                     </div>
                     <div class="user-info">
-                        <h4><?php echo htmlspecialchars($currentUser['fullName']); ?></h4>
+                        <h4><?php echo htmlspecialchars($currentUser['first_name'] . ' ' . $currentUser['last_name']); ?></h4>
                         <p><?php echo htmlspecialchars($currentUser['username']); ?></p>
                     </div>
                     <i class="fas fa-chevron-down"></i>
@@ -71,9 +133,11 @@ requireLogin();
             <div class="bookmarks-container">
                 <div class="bookmarks-header">
                     <h1>Bookmarks</h1>
-                    <button class="clear-all-bookmarks" id="clearAllBookmarks">
-                        <i class="fas fa-trash"></i> Clear all bookmarks
-                    </button>
+                    <form method="post" onsubmit="return confirm('Are you sure you want to clear all bookmarks? This action cannot be undone.');">
+                        <button type="submit" name="clear_all_bookmarks" class="clear-all-bookmarks" id="clearAllBookmarks">
+                            <i class="fas fa-trash"></i> Clear all bookmarks
+                        </button>
+                    </form>
                 </div>
                 
                 <div class="bookmarks-tabs">
@@ -82,124 +146,54 @@ requireLogin();
                 </div>
                 
                 <div class="bookmarks-list" id="bookmarksList">
-                    <!-- Bookmark items will be populated by JavaScript -->
-                    <div class="bookmark-item" data-type="announcement">
-                        <div class="bookmark-avatar">
-                            <img src="img/avatar-placeholder.png" alt="User Avatar">
+                    <?php if (empty($bookmarked_posts)): ?>
+                        <div class="empty-bookmarks" id="emptyBookmarks">
+                            <i class="fas fa-bookmark empty-icon"></i>
+                            <h2>No Bookmarks Yet</h2>
+                            <p>You haven't bookmarked any posts yet. Start bookmarking posts to see them here.</p>
                         </div>
-                        <div class="bookmark-content">
-                            <div class="bookmark-header">
-                                <span class="bookmark-author">Person</span>
-                                <span class="bookmark-username">@person</span>
-                                <span class="bookmark-date">May 7, 2025</span>
+                    <?php else: ?>
+                        <?php foreach ($bookmarked_posts as $post): ?>
+                            <div class="bookmark-item" data-type="announcement">
+                                <div class="bookmark-avatar">
+                                    <?php
+                                    $profilePic = $post['profile_picture'] ?? '';
+                                    if ($profilePic) {
+                                        $profilePic = preg_replace('#^uploads/#', '', $profilePic);
+                                        $imgSrc = 'uploads/' . htmlspecialchars($profilePic);
+                                    } else {
+                                        $imgSrc = 'img/avatar-placeholder.png';
+                                    }
+                                    ?>
+                                    <img src="<?php echo $imgSrc; ?>" alt="User Avatar">
+                                </div>
+                                <div class="bookmark-content">
+                                    <div class="bookmark-header">
+                                        <span class="bookmark-author"><?php echo htmlspecialchars($post['first_name'] . ' ' . $post['last_name']); ?></span>
+                                        <span class="bookmark-username">@<?php echo htmlspecialchars(strtolower($post['first_name'] . $post['last_name'])); ?></span>
+                                        <span class="bookmark-date"><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
+                                    </div>
+                                    <div class="bookmark-title"><?php echo htmlspecialchars($post['title']); ?></div>
+                                    <div class="bookmark-text">
+                                        <?php echo htmlspecialchars($post['content']); ?>
+                                    </div>
+                                    <div class="bookmark-tag">
+                                        <!-- You might need a way to map department ID back to code, e.g., DIT, DOM -->
+                                        <span class="tag">DEPARTMENT</span>
+                                    </div>
+                                    <div class="bookmark-stats">
+                                        <!-- Stats would need additional queries, keeping it simple for now -->
+                                        <span class="stat"><i class="fas fa-comment"></i> 0</span>
+                                        <span class="stat"><i class="fas fa-heart"></i> 0</span>
+                                        <span class="stat"><i class="fas fa-eye"></i> 0</span>
+                                    </div>
+                                </div>
+                                <button class="remove-bookmark" data-id="<?php echo $post['post_id']; ?>">
+                                    <i class="fas fa-bookmark"></i>
+                                </button>
                             </div>
-                            <div class="bookmark-title">CSHARP General Assembly</div>
-                            <div class="bookmark-text">
-                                General Assembly will be held on May 8 in the school gallery. All students, parents, and staff are invited to the opening reception from 9:00 AM to 12:00 PM. Refreshments will be served.
-                            </div>
-                            <div class="bookmark-tag">
-                                <span class="tag dit">DIT</span>
-                            </div>
-                            <div class="bookmark-stats">
-                                <span class="stat">
-                                    <i class="fas fa-comment"></i> 2
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-heart"></i> 7
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-eye"></i> 15
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-share"></i> 6
-                                </span>
-                            </div>
-                        </div>
-                        <button class="remove-bookmark" data-id="1">
-                            <i class="fas fa-bookmark"></i>
-                        </button>
-                    </div>
-
-                    <div class="bookmark-item" data-type="announcement">
-                        <div class="bookmark-avatar">
-                            <img src="img/avatar-placeholder.png" alt="User Avatar">
-                        </div>
-                        <div class="bookmark-content">
-                            <div class="bookmark-header">
-                                <span class="bookmark-author">Person</span>
-                                <span class="bookmark-username">@person</span>
-                                <span class="bookmark-date">May 2, 2025</span>
-                            </div>
-                            <div class="bookmark-title">Capstone Project Defense Schedule Released!</div>
-                            <div class="bookmark-text">
-                                All graduating students must check the updated schedule posted on the IT Department website. Final defense starts on May 2, 2025.
-                            </div>
-                            <div class="bookmark-tag">
-                                <span class="tag dit">DIT</span>
-                            </div>
-                            <div class="bookmark-stats">
-                                <span class="stat">
-                                    <i class="fas fa-comment"></i> 2
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-heart"></i> 15
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-eye"></i> 18
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-share"></i> 4
-                                </span>
-                            </div>
-                        </div>
-                        <button class="remove-bookmark" data-id="2">
-                            <i class="fas fa-bookmark"></i>
-                        </button>
-                    </div>
-
-                    <div class="bookmark-item" data-type="mention">
-                        <div class="bookmark-avatar">
-                            <img src="img/avatar-placeholder.png" alt="User Avatar">
-                        </div>
-                        <div class="bookmark-content">
-                            <div class="bookmark-header">
-                                <span class="bookmark-author">Person</span>
-                                <span class="bookmark-username">@person</span>
-                                <span class="bookmark-date">May 28, 2025</span>
-                            </div>
-                            <div class="bookmark-title">Science & Arts Journal</div>
-                            <div class="bookmark-text">
-                                Deadline: May 20, 2025. Open to all students and faculty.
-                            </div>
-                            <div class="bookmark-tag">
-                                <span class="tag dit">DIT</span>
-                            </div>
-                            <div class="bookmark-stats">
-                                <span class="stat">
-                                    <i class="fas fa-comment"></i> 2
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-heart"></i> 15
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-eye"></i> 18
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-share"></i> 9
-                                </span>
-                            </div>
-                        </div>
-                        <button class="remove-bookmark" data-id="3">
-                            <i class="fas fa-bookmark"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Empty state (hidden by default) -->
-                <div class="empty-bookmarks" id="emptyBookmarks" style="display: none;">
-                    <i class="fas fa-bookmark empty-icon"></i>
-                    <h2>No Bookmarks Yet</h2>
-                    <p>You haven't bookmarked any posts yet. Start bookmarking posts to see them here.</p>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </main>

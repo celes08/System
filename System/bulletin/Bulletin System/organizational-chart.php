@@ -1,6 +1,8 @@
 <?php
 include("user_session.php");
 requireLogin();
+include("connections.php");
+include("post-modal-shared.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,9 +12,16 @@ requireLogin();
     <title>Organizational Chart - CVSU Department Bulletin Board System</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="organizational-chart.css">
+    <link rel="stylesheet" href="post-modal.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="dashboard-body">
+<body class="dashboard-body<?php
+if (isset($_SESSION['theme'])) {
+    echo ' ' . htmlspecialchars($_SESSION['theme']) . '-theme';
+} else {
+    echo ' system-theme';
+}
+?>">
     <div class="dashboard-container" id="dashboardContainer">
         <!-- Left Sidebar Navigation (Same as dashboard) -->
         <aside class="sidebar">
@@ -41,9 +50,11 @@ requireLogin();
             </nav>
             
             <div class="post-button-container">
-                <button class="post-button" id="postButton">
-                    <i class="fas fa-plus"></i> Post
-                </button>
+                <form method="post" style="margin:0;">
+                    <button class="post-button" name="showPostModal" type="submit">
+                        <i class="fas fa-plus"></i> Post
+                    </button>
+                </form>
             </div>
             
             <div class="sidebar-footer">
@@ -55,7 +66,17 @@ requireLogin();
                 
                 <div class="user-profile">
                     <div class="user-avatar">
-                        <img src="img/avatar-placeholder.png" alt="User Avatar">
+                        <?php
+                        $profilePic = $currentUser['profile_picture'] ?? '';
+                        if ($profilePic) {
+                            $profilePic = preg_replace('#^uploads/#', '', $profilePic);
+                            $imgSrc = 'uploads/' . htmlspecialchars($profilePic);
+                        } else {
+                            $initials = htmlspecialchars(substr($currentUser['fullName'], 0, 1));
+                            $imgSrc = 'https://placehold.co/36x36/cccccc/000000?text=' . $initials;
+                        }
+                        ?>
+                        <img src="<?php echo $imgSrc; ?>" alt="User Avatar">
                     </div>
                     <div class="user-info">
                         <h4><?php echo htmlspecialchars($currentUser['fullName']); ?></h4>

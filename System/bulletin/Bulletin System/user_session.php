@@ -1,7 +1,9 @@
 <?php
 // user_session.php - Shared user session management
 include("connections.php");
+if (session_status() === PHP_SESSION_NONE) {
 session_start();
+}
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);
@@ -18,7 +20,7 @@ function getUserData() {
     $user_id = $_SESSION['user_id'];
     
     // Fetch user info
-    $stmt = $con->prepare("SELECT firstName, middleName, lastName, email, dateOfBirth, studentNumber, department FROM signuptbl WHERE user_id = ?");
+    $stmt = $con->prepare("SELECT first_name, middle_name, last_name, username, email, date_of_birth, student_number, department, profile_picture FROM signuptbl WHERE user_id = ?");
     if (!$stmt) {
         echo "<!-- Debug: Prepare failed: " . $con->error . " -->";
         return null;
@@ -31,27 +33,38 @@ function getUserData() {
     echo "<!-- Debug: Number of rows found: " . $stmt->num_rows . " -->";
     
     if ($stmt->num_rows === 1) {
-        $stmt->bind_result($firstName, $middleName, $lastName, $email, $dateOfBirth, $studentNumber, $department);
+        $stmt->bind_result($first_name, $middle_name, $last_name, $username, $email, $date_of_birth, $student_number, $department, $profile_picture);
         $stmt->fetch();
         $stmt->close();
         
-        $fullName = trim($firstName . ' ' . $middleName . ' ' . $lastName);
-        $username = '@' . strtolower($firstName . $lastName);
-        
+        // Build the full name safely
+        $nameParts = [];
+        if (!empty($first_name)) {
+            $nameParts[] = $first_name;
+        }
+        if (!empty($middle_name)) {
+            $nameParts[] = $middle_name;
+        }
+        if (!empty($last_name)) {
+            $nameParts[] = $last_name;
+        }
+        $fullName = implode(' ', $nameParts);
+
         echo "<!-- Debug: Fetched name: " . $fullName . " -->";
         echo "<!-- Debug: Fetched username: " . $username . " -->";
         
         return [
             'user_id' => $user_id,
-            'firstName' => $firstName,
-            'middleName' => $middleName,
-            'lastName' => $lastName,
+            'first_name' => $first_name,
+            'middle_name' => $middle_name,
+            'last_name' => $last_name,
             'email' => $email,
-            'dateOfBirth' => $dateOfBirth,
-            'studentNumber' => $studentNumber,
+            'date_of_birth' => $date_of_birth,
+            'student_number' => $student_number,
             'department' => $department,
             'fullName' => $fullName,
-            'username' => $username
+            'username' => $username,
+            'profile_picture' => $profile_picture
         ];
     }
     

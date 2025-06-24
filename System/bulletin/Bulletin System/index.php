@@ -18,6 +18,7 @@ $department = $_POST['department'] ?? '';
 $password = '';
 $confirmPassword = '';
 $loginEmail = $_POST['loginEmail'] ?? '';
+$username = trim($_POST['username'] ?? '');
 
 // --- Process Signup Form Submission ---
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signupButton'])) {
@@ -30,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signupButton'])) {
     $department = trim($_POST['department'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';
+    $username = trim($_POST['username'] ?? '');
 
     // Server-side validation
     if (empty($firstName)) $errors[] = "First name is required.";
@@ -41,6 +43,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signupButton'])) {
     if (empty($department)) $errors[] = "Department is required.";
     if (empty($password) || strlen($password) < 6) $errors[] = "Password must be at least 6 characters.";
     if ($password !== $confirmPassword) $errors[] = "Passwords do not match.";
+    if (empty($username)) $errors[] = "Username is required.";
+    if (!preg_match('/^[A-Za-z0-9_]{3,20}$/', $username)) $errors[] = "Username must be 3-20 characters, letters, numbers, or underscores only.";
 
     // Check for duplicate email
     if (empty($errors)) {
@@ -52,14 +56,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signupButton'])) {
         $stmt->close();
     }
 
+    // Check for duplicate username
+    if (empty($errors)) {
+        $stmt = $con->prepare("SELECT username FROM signuptbl WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) $errors[] = "Username already taken.";
+        $stmt->close();
+    }
+
     // Insert into database if no errors
     if (empty($errors)) {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $con->prepare("INSERT INTO signuptbl (firstName, middleName, lastName, email, dateOfBirth, studentNumber, department, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssssss", $firstName, $middleName, $lastName, $email, $dateOfBirth, $studentNumber, $department, $hashedPassword);
+        $stmt = $con->prepare("INSERT INTO signuptbl (first_name, middle_name, last_name, username, email, date_of_birth, student_number, department, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssssss", $firstName, $middleName, $lastName, $username, $email, $dateOfBirth, $studentNumber, $department, $hashedPassword);
         if ($stmt->execute()) {
             $success_message = "Signup successful! You may now log in.";
-            $firstName = $middleName = $lastName = $email = $dateOfBirth = $studentNumber = $department = '';
+            $firstName = $middleName = $lastName = $email = $dateOfBirth = $studentNumber = $department = $username = '';
         } else {
             $errors[] = "Database error: " . $stmt->error;
         }
@@ -266,6 +280,10 @@ if (!empty($errors) && isset($_POST['loginButton'])) {
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password</label>
                         <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($username); ?>" required pattern="[A-Za-z0-9_]{3,20}" title="3-20 characters, letters, numbers, or underscores only">
                     </div>
                     <button type="submit" name="signupButton" class="login-button">Sign Up</button>
                 </form>

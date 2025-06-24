@@ -67,7 +67,13 @@ if ($result) {
     <link rel="stylesheet" href="help.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="dashboard-body">
+<body class="dashboard-body<?php
+if (isset($_SESSION['theme'])) {
+    echo ' ' . htmlspecialchars($_SESSION['theme']) . '-theme';
+} else {
+    echo ' system-theme';
+}
+?>">
     <div class="dashboard-container" id="dashboardContainer">
         <!-- Left Sidebar Navigation (Same as dashboard) -->
         <aside class="sidebar">
@@ -106,7 +112,17 @@ if ($result) {
                 </ul>
                 <div class="user-profile">
                     <div class="user-avatar">
-                        <img src="img/avatar-placeholder.png" alt="User Avatar">
+                        <?php
+                        $profilePic = $currentUser['profile_picture'] ?? '';
+                        if ($profilePic) {
+                            $profilePic = preg_replace('#^uploads/#', '', $profilePic);
+                            $imgSrc = 'uploads/' . htmlspecialchars($profilePic);
+                        } else {
+                            $initials = htmlspecialchars(substr($currentUser['fullName'], 0, 1));
+                            $imgSrc = 'https://placehold.co/36x36/cccccc/000000?text=' . $initials;
+                        }
+                        ?>
+                        <img src="<?php echo $imgSrc; ?>" alt="User Avatar">
                     </div>
                     <div class="user-info">
                         <h4><?php echo htmlspecialchars($currentUser['fullName']); ?></h4>

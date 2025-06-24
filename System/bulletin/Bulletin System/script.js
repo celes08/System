@@ -646,16 +646,16 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  // Post button click handler
-  const postButton = document.querySelector(".post-button")
-  if (postButton) {
-    postButton.addEventListener("click", () => {
-      // Show a modal or navigate to post creation page
-      alert("Create a new post functionality will be implemented here.")
-    })
-  }
+  // Post button click handler - REMOVED TO PREVENT CONFLICTS
+  // const postButton = document.querySelector(".post-button")
+  // if (postButton) {
+  //   postButton.addEventListener("click", () => {
+  //     // Show a modal or navigate to post creation page
+  //     alert("Create a new post functionality will be implemented here.")
+  //   })
+  // }
 
-  // Make post button work on all pages
+  // Make post button work on all pages - IMPROVED VERSION
   document.addEventListener("DOMContentLoaded", () => {
     // Post button functionality for all pages
     const postButtons = document.querySelectorAll(".post-button, #postButton")
@@ -664,6 +664,8 @@ document.addEventListener("DOMContentLoaded", () => {
         button.setAttribute("data-listener-added", "true")
         button.addEventListener("click", (e) => {
           e.preventDefault()
+          e.stopPropagation() // Prevent event bubbling
+          
           // Check if we're on dashboard page
           if (
             window.location.pathname.includes("dashboard.html") ||

@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize profile page
     initializeProfile()
     setupEventListeners()
-    loadProfileData()
+    // loadProfileData() // This is no longer needed as data is rendered by PHP
   })
   
   function initializeProfile() {
@@ -57,32 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (selectedTab) selectedTab.classList.add("active")
     if (selectedContent) selectedContent.classList.add("active")
   
-    // Load content based on tab
-    switch (tabName) {
-      case "posts":
-        loadUserPosts()
-        break
-      case "liked":
-        loadLikedPosts()
-        break
-      case "comments":
-        loadCommentedPosts()
-        break
-    }
-  }
-  
-  function loadProfileData() {
-    // Load user profile information
-    const userData = getUserData()
-  
-    // Update profile information
-    document.getElementById("profileName").textContent = userData.name || "Person"
-    document.getElementById("profileUsername").textContent = userData.username || "@person"
-    document.getElementById("profileJoined").textContent = `Joined ${userData.joinDate || "May 7, 2025"}`
-  
-    // Load initial content (posts)
-    loadUserPosts()
-    updateProfileStats()
+    // Removed JS content loading for tabs
   }
   
   function loadUserPosts() {
@@ -436,4 +411,17 @@ document.addEventListener("DOMContentLoaded", () => {
     loadLikedPosts: loadLikedPosts,
     loadCommentedPosts: loadCommentedPosts,
   }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    const profilePictureInput = document.getElementById('profilePictureInput');
+    const profilePictureForm = document.getElementById('profilePictureForm');
+
+    if (profilePictureInput) {
+        profilePictureInput.addEventListener('change', function() {
+            if (profilePictureForm) {
+                profilePictureForm.submit();
+            }
+        });
+    }
+  });
   

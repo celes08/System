@@ -21,7 +21,7 @@
 }
 
 .profile-cover {
-  background: linear-gradient(135deg, #1b4332, #2d5a3d);
+  background: linear-gradient(135deg, #132a13, #2d5a3d);
   height: 150px;
   position: relative;
   display: flex;
@@ -74,7 +74,7 @@
 
 /* Profile Info */
 .profile-info {
-  position: sticky;
+  position: static;
   top: 150px; /* height of .profile-cover */
   z-index: 9;
   background: white;
@@ -634,4 +634,32 @@ body.dashboard-body {
   height: 100vh;
   margin: 0;
   padding: 0;
+}
+
+.profile-avatar-label {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+}
+
+.profile-avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 50%;
+    font-size: 2rem;
+    z-index: 10;
+}
+
+.profile-avatar-label:hover .profile-avatar-overlay {
+    opacity: 1;
 }

@@ -12,35 +12,45 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize bookmarked posts on page load
     initializeBookmarks()
   
-    // Handle comment button clicks
+    // Handle comment button clicks - IMPROVED VERSION
     document.addEventListener("click", (e) => {
       // Comment button click
       if (e.target.closest(".comment-btn")) {
         e.stopPropagation()
+        e.preventDefault()
         const btn = e.target.closest(".comment-btn")
         currentPostId = btn.getAttribute("data-post-id")
         openCommentModal()
+        return
       }
   
-      // Post card click (show/hide comments)
-      else if (e.target.closest(".post-card")) {
+      // Post card click (show/hide comments) - ONLY if not clicking on buttons
+      else if (e.target.closest(".post-card") && 
+               !e.target.closest(".action-btn") && 
+               !e.target.closest(".post-button") &&
+               !e.target.closest(".modal-overlay")) {
         const postCard = e.target.closest(".post-card")
         const postId = postCard.getAttribute("data-post-id")
         toggleComments(postId)
+        return
       }
   
       // Like button click
       else if (e.target.closest(".like-btn")) {
         e.stopPropagation()
+        e.preventDefault()
         const btn = e.target.closest(".like-btn")
         toggleLike(btn)
+        return
       }
   
       // Bookmark button click
       else if (e.target.closest(".bookmark-btn")) {
         e.stopPropagation()
+        e.preventDefault()
         const btn = e.target.closest(".bookmark-btn")
         toggleBookmark(btn)
+        return
       }
     })
   

@@ -821,3 +821,79 @@
     padding: 0;
   }
   
+  /* Force settings sidebar to match dashboard sidebar */
+  .sidebar,
+  .sidebar-header,
+  .sidebar-nav,
+  .sidebar-footer,
+  .post-button,
+  .user-profile {
+    background-color: #132a13 !important;
+    color: white !important;
+  }
+  .sidebar-nav a,
+  .sidebar-footer a {
+    color: rgba(255,255,255,0.8) !important;
+  }
+  .sidebar-nav a:hover,
+  .sidebar-footer a:hover {
+    color: white !important;
+    background-color: rgba(255,255,255,0.05) !important;
+  }
+  .post-button {
+    background-color: white !important;
+    color: #132a13 !important;
+  }
+  .post-button:hover {
+    background-color: #f0f0f0 !important;
+  }
+  .user-profile {
+    background-color: rgba(255,255,255,0.05) !important;
+  }
+  
+  /* FORCE settings sidebar to match dashboard sidebar (final override) */
+  .sidebar,
+  .sidebar-header,
+  .sidebar-nav,
+  .sidebar-footer {
+    background-color: #132a13 !important;
+    color: white !important;
+  }
+  .sidebar-nav a,
+  .sidebar-footer a {
+    color: rgba(255,255,255,0.8) !important;
+  }
+  .sidebar-nav a:hover,
+  .sidebar-footer a:hover {
+    color: white !important;
+    background-color: rgba(255,255,255,0.05) !important;
+  }
+  .sidebar-nav li.active a {
+    background-color: rgba(255,255,255,0.1) !important;
+    font-weight: bold;
+  }
+  .post-button {
+    background-color: white !important;
+    color: #132a13 !important;
+  }
+  .post-button:hover {
+    background-color: #f0f0f0 !important;
+  }
+  .user-profile {
+    background-color: rgba(255,255,255,0.05) !important;
+    color: white !important;
+  }
+  
+:root, .dashboard-body, body {
+    --sidebar-bg: #132a13 !important;
+    --sidebar-text-primary: #fff !important;
+    --sidebar-text-secondary: rgba(255,255,255,0.8) !important;
+    --sidebar-hover-bg: rgba(255,255,255,0.05) !important;
+    --sidebar-active-bg: rgba(255,255,255,0.1) !important;
+    --sidebar-border: rgba(255,255,255,0.1) !important;
+    --post-button-bg: #fff !important;
+    --post-button-text: #132a13 !important;
+    --post-button-hover-bg: #f0f0f0 !important;
+    --user-profile-bg: rgba(255,255,255,0.05) !important;
+}
+  
