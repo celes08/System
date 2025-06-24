@@ -1,0 +1,147 @@
+/* Notifications Page Styles */
+
+/* Adjust main content for notifications page */
+.notifications-content {
+    background-color: #f5f5f5;
+    background-image: url('img/subtle-pattern.png');
+    background-blend-mode: overlay;
+    padding: 0;
+}
+
+.notifications-container {
+    width: 100%;
+    height: 100%;
+}
+
+/* Notifications Header */
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: rgba(245, 245, 245, 0.9);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.notifications-header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+    font-weight: bold;
+}
+
+.mark-all-read {
+    display: flex;
+    align-items: center;
+    background-color: rgba(27, 67, 50, 0.2);
+    color: #1b4332;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.mark-all-read i {
+    margin-right: 8px;
+    color: #1b4332;
+}
+
+.mark-all-read:hover:not([disabled]) {
+    background-color: rgba(27, 67, 50, 0.3);
+}
+
+.mark-all-read[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Notification Tabs */
+.notifications-tabs {
+    display: flex;
+    background-color: rgba(245, 245, 245, 0.9);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.notification-tab {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #495057;
+    position: relative;
+    transition: color 0.3s;
+}
+
+.notification-tab:hover {
+    color: #1b4332;
+}
+
+.notification-tab.active {
+    color: #1b4332;
+    font-weight: bold;
+    border-bottom: 2px solid #1b4332;
+}
+
+/* Notifications List */
+.notifications-list {
+    background-color: rgba(245, 245, 245, 0.8);
+    min-height: calc(100vh - 130px); /* Ensure it takes up remaining space */
+}
+
+.notifications-list.empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Empty State */
+.empty-notifications {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 20px;
+    text-align: center;
+}
+
+.empty-notifications .empty-icon {
+    font-size: 48px;
+    color: #adb5bd;
+    margin-bottom: 16px;
+}
+
+.empty-notifications h2 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    color: #495057;
+}
+
+.empty-notifications p {
+    margin: 0;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* Notification Items (hidden in empty state) */
+.notification-item {
+    display: none; /* Hide all notification items in empty state */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .notifications-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .mark-all-read {
+        margin-top: 12px;
+    }
+    
+    .notification-tab {
+        padding: 10px 15px;
+    }
+}

@@ -1,0 +1,586 @@
+/* Help Page Specific Styles */
+
+/* Main Content Layout */
+.help-main-content {
+    margin-left: 250px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    width: calc(100% - 250px);
+}
+
+/* Help Header */
+.help-header {
+    background-color: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 15px 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    position: relative;
+    top: 0;
+    z-index: 50;
+    width: calc(100% - 100px);
+    box-sizing: content-box;
+    margin-left: 30px;
+    margin-right: 20px;
+    border-left: none;
+    border-right: none;
+}
+
+.help-header-left {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.help-header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Help Tabs Container */
+.help-tabs-container {
+    width: 100%;
+    background-color: white;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Help Tabs - Using notifications.css style */
+.help-tabs {
+    display: flex;
+    background-color: white;
+    padding: 0 50px; /* Match header padding */
+}
+
+.help-tab {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #495057;
+    position: relative;
+    transition: color 0.3s;
+    border-bottom: 2px solid transparent;
+}
+
+.help-tab:hover {
+    color: #1b4332;
+}
+
+.help-tab.active {
+    color: #1b4332;
+    font-weight: bold;
+    border-bottom: 2px solid #1b4332;
+}
+
+/* Submit Ticket Button */
+.submit-ticket-btn {
+    background: linear-gradient(135deg, #52a373, #1b4332);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(27, 67, 50, 0.2);
+}
+
+.submit-ticket-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(27, 67, 50, 0.3);
+}
+
+.submit-ticket-btn:active {
+    transform: translateY(0);
+}
+
+/* Help Content */
+.help-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.help-tickets {
+    padding: 20px 50px;
+    width: calc(100% - 100px);
+    margin: 0;
+    box-sizing: content-box;
+}
+
+/* Help Ticket Item */
+.help-ticket {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    gap: 16px;
+    border-left: 4px solid transparent;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.help-ticket:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
+}
+
+.help-ticket[data-status="pending"] {
+    border-left-color: #f59e0b;
+}
+
+.help-ticket[data-status="resolved"] {
+    border-left-color: #10b981;
+}
+
+/* Ticket Avatar */
+.ticket-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.ticket-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Ticket Content */
+.ticket-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.ticket-header {
+    margin-bottom: 12px;
+}
+
+.ticket-user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ticket-author {
+    font-weight: 600;
+    color: #333;
+    font-size: 15px;
+}
+
+.ticket-username {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.ticket-date {
+    color: #6c757d;
+    font-size: 13px;
+}
+
+.ticket-date::before {
+    content: "•";
+    margin: 0 4px;
+    color: #adb5bd;
+}
+
+/* Ticket Body */
+.ticket-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ticket-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.ticket-description {
+    font-size: 14px;
+    color: #495057;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Ticket Status */
+.ticket-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    align-self: flex-start;
+    margin-top: 8px;
+}
+
+.ticket-status.pending {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.ticket-status.resolved {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #1b4332;
+    box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    appearance: none;
+    box-sizing: border-box;
+}
+
+.select-wrapper select:focus {
+    outline: none;
+    border-color: #1b4332;
+    box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+}
+
+.select-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    background: none;
+    border: 2px solid #e5e7eb;
+    color: #6c757d;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    border-color: #1b4332;
+    color: #1b4332;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #52a373, #1b4332);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(27, 67, 50, 0.3);
+}
+
+/* Filter States */
+.help-ticket.hidden {
+    display: none;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #adb5bd;
+}
+
+.empty-state h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    color: #495057;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .help-main-content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+    
+    .help-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+        padding: 16px 30px;
+        width: calc(100% - 60px);
+    }
+    
+    .help-header-left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .help-tabs {
+        padding: 0 30px;
+    }
+    
+    .help-tab {
+        padding: 10px 15px;
+    }
+    
+    .help-tickets {
+        padding: 16px 30px;
+        width: calc(100% - 60px);
+    }
+    
+    .help-ticket {
+        padding: 16px;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .ticket-avatar {
+        width: 40px;
+        height: 40px;
+        align-self: flex-start;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .help-main-content {
+        margin-left: 180px;
+        width: calc(100% - 180px);
+    }
+    
+    .help-header {
+        padding: 12px 20px;
+        width: calc(100% - 40px);
+    }
+    
+    .help-header h1 {
+        font-size: 20px;
+    }
+    
+    .help-tabs {
+        padding: 0 20px;
+    }
+    
+    .help-tickets {
+        padding: 12px 20px;
+        width: calc(100% - 40px);
+    }
+    
+    .help-ticket {
+        padding: 12px;
+    }
+    
+    .ticket-title {
+        font-size: 15px;
+    }
+    
+    .ticket-description {
+        font-size: 13px;
+    }
+}
+
+/* Custom Scrollbar */
+.help-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.help-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.help-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+.help-content::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* Ensure no body overflow issues */
+body.dashboard-body {
+    overflow: hidden;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Fix any potential container issues */
+.dashboard-container {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}

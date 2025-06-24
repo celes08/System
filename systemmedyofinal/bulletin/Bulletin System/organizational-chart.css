@@ -1,0 +1,463 @@
+/* Organizational Chart Page Styles */
+
+/* Main Content Layout */
+.org-chart-main-content {
+    margin-left: 280px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    width: calc(100% - 250px);
+  }
+  
+  /* Header */
+  .org-chart-header {
+    background-color: white;
+    padding: 20px 30px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 50;
+  }
+  
+  .org-chart-header-content h1 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+  }
+  
+  .org-chart-header-content p {
+    margin: 0;
+    font-size: 16px;
+    color: #6c757d;
+  }
+  
+  /* Department Tabs Container */
+  .department-tabs-container {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+  }
+  
+  /* Department Tabs */
+  .department-tabs {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .dept-tab {
+    padding: 14px 32px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  .dept-tab:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dept-tab.active {
+    background-color: #1b4332;
+    color: white;
+    box-shadow: 0 4px 16px rgba(27, 67, 50, 0.4);
+    transform: translateY(-1px);
+  }
+  
+  /* Department specific colors */
+  .dept-tab[data-department="dit"].active {
+    background-color: #16a34a;
+    box-shadow: 0 4px 16px rgba(22, 163, 74, 0.4);
+  }
+  
+  .dept-tab[data-department="dom"].active {
+    background-color: #2563eb;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+  }
+  
+  .dept-tab[data-department="das"].active {
+    background-color: #7c3aed;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4);
+  }
+  
+  .dept-tab[data-department="ted"].active {
+    background-color: #d97706;
+    box-shadow: 0 4px 16px rgba(217, 119, 6, 0.4);
+  }
+  
+  /* Scrollable Content */
+  .org-chart-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    padding: 0;
+  }
+  
+  /* Department Sections */
+  .department-section {
+    min-height: 100vh;
+    padding: 40px 50px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .department-section:not(:last-child) {
+    border-bottom: 2px solid #e5e7eb;
+  }
+  
+  /* Department Headers */
+  .department-header {
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  .department-header h2 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+  }
+  
+  .department-header p {
+    margin: 0;
+    font-size: 16px;
+    color: #6c757d;
+  }
+  
+  /* Organizational Chart Container */
+  .org-chart-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+    overflow: auto;
+    flex-wrap: wrap;
+  }
+  
+  /* Organizational Chart Image */
+  .org-chart-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: zoom-in;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .org-chart-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Placeholder for departments without images */
+  .org-chart-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    min-height: 400px;
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .org-chart-placeholder i {
+    font-size: 64px;
+    color: #adb5bd;
+    margin-bottom: 20px;
+  }
+  
+  .org-chart-placeholder h3 {
+    margin: 0 0 12px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #495057;
+  }
+  
+  .org-chart-placeholder p {
+    margin: 0;
+    font-size: 16px;
+    color: #6c757d;
+    line-height: 1.5;
+  }
+  
+  /* Department specific placeholder colors */
+  .department-section[data-department="dit"] .org-chart-placeholder i {
+    color: #16a34a;
+  }
+  
+  .department-section[data-department="dom"] .org-chart-placeholder i {
+    color: #2563eb;
+  }
+  
+  .department-section[data-department="das"] .org-chart-placeholder i {
+    color: #7c3aed;
+  }
+  
+  .department-section[data-department="ted"] .org-chart-placeholder i {
+    color: #d97706;
+  }
+  
+  /* Zoom Modal for Images */
+  .zoom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .zoom-modal.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .zoom-modal img {
+    max-width: 95%;
+    max-height: 95%;
+    border-radius: 8px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+    cursor: zoom-out;
+  }
+  
+  .zoom-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .zoom-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Custom Scrollbar */
+  .org-chart-content::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .org-chart-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .org-chart-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  
+  .org-chart-content::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .org-chart-main-content {
+      margin-left: 200px;
+      width: calc(100% - 200px);
+    }
+  
+    .org-chart-header {
+      padding: 16px 30px;
+    }
+  
+    .org-chart-header-content h1 {
+      font-size: 24px;
+    }
+  
+    .org-chart-header-content p {
+      font-size: 14px;
+    }
+  
+    .department-tabs {
+      padding: 0 30px;
+      gap: 4px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+  
+    .dept-tab {
+      padding: 10px 16px;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+  
+    .department-section {
+      padding: 30px 30px;
+    }
+  
+    .department-header h2 {
+      font-size: 20px;
+    }
+  
+    .department-header p {
+      font-size: 14px;
+    }
+  
+    .org-chart-placeholder {
+      padding: 60px 30px;
+      min-height: 300px;
+    }
+  
+    .org-chart-placeholder i {
+      font-size: 48px;
+    }
+  
+    .org-chart-placeholder h3 {
+      font-size: 20px;
+    }
+  
+    .org-chart-placeholder p {
+      font-size: 14px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .org-chart-main-content {
+      margin-left: 180px;
+      width: calc(100% - 180px);
+    }
+  
+    .org-chart-header {
+      padding: 12px 20px;
+    }
+  
+    .org-chart-header-content h1 {
+      font-size: 20px;
+    }
+  
+    .department-tabs {
+      padding: 0 20px;
+    }
+  
+    .dept-tab {
+      padding: 8px 12px;
+      font-size: 11px;
+    }
+  
+    .department-section {
+      padding: 20px 20px;
+    }
+  
+    .department-header h2 {
+      font-size: 18px;
+    }
+  
+    .org-chart-placeholder {
+      padding: 40px 20px;
+      min-height: 250px;
+    }
+  
+    .org-chart-placeholder i {
+      font-size: 40px;
+    }
+  
+    .org-chart-placeholder h3 {
+      font-size: 18px;
+    }
+  }
+  
+  /* Ensure no body overflow issues */
+  body.dashboard-body {
+    overflow: hidden;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Smooth scroll indicator */
+  .scroll-indicator {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 100;
+  }
+  
+  .scroll-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(108, 117, 125, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .scroll-dot.active {
+    background-color: #1b4332;
+    transform: scale(1.5);
+  }
+  
+  .scroll-dot:hover {
+    background-color: rgba(27, 67, 50, 0.7);
+    transform: scale(1.2);
+  }
+  
+  .scrollable-ted {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+    margin-top: 24px;
+    width: 100%;
+  }
+  
+  body .sidebar {
+    background-color: #132a13 !important;
+    color: white !important;
+  }
+  
+  .sidebar-header, .sidebar-nav, .sidebar-footer {
+    background-color: #132a13 !important;
+    color: white !important;
+  }
+  
